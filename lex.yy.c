@@ -746,22 +746,22 @@ YY_RULE_SETUP
 case 3:
 YY_RULE_SETUP
 #line 15 "trabalho.lex"
-{ yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _ID; }
+{ yylval = Atributo( yytext ); return _ID; }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 16 "trabalho.lex"
-{ yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _CTE_INT; }
+{ yylval = Atributo( yytext ); return _CTE_INT; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 17 "trabalho.lex"
-{ yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _CTE_DOUBLE; }
+{ yylval = Atributo( yytext ); return _CTE_DOUBLE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 19 "trabalho.lex"
-{ yylval.c = ""; yylval.t = ""; yylval.v = yytext; return *yytext; }
+{ yylval = Atributo( yytext ); return *yytext; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP

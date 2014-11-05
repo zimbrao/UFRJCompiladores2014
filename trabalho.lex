@@ -12,11 +12,11 @@ ID      {LETRA}({LETRA}|{NUMERO})*
 {LINHA}    { nlinha++; }
 {DELIM}    {}
 
-{ID}       { yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _ID; }
-{INT}      { yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _CTE_INT; }
-{DOUBLE}   { yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _CTE_DOUBLE; }
+{ID}       { yylval = Atributo( yytext ); return _ID; }
+{INT}      { yylval = Atributo( yytext ); return _CTE_INT; }
+{DOUBLE}   { yylval = Atributo( yytext ); return _CTE_DOUBLE; }
 
-.          { yylval.c = ""; yylval.t = ""; yylval.v = yytext; return *yytext; }
+.          { yylval = Atributo( yytext ); return *yytext; }
 
 %%
 
