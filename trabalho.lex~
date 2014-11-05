@@ -16,7 +16,7 @@ ID      {LETRA}({LETRA}|{NUMERO})*
 {INT}      { yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _CTE_INT; }
 {DOUBLE}   { yylval.c = ""; yylval.t = ""; yylval.v = yytext; return _CTE_DOUBLE; }
 
-.          { yylval.c = ""; yylval.t = ""; yylval.v = yytext; return *yytext; }
+.          { return *yytext; }
 
 %%
 

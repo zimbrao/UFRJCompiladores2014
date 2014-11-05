@@ -75,7 +75,13 @@
 
 using namespace std;
 
-#define YYSTYPE string
+struct Atributo {
+  string v;  // Valor
+  string c;  // codigo
+  string t;  // tipo
+};
+
+#define YYSTYPE Atributo
 
 int yylex();
 int yyparse();
@@ -83,7 +89,7 @@ void yyerror(const char *);
 
 
 /* Line 268 of yacc.c  */
-#line 87 "y.tab.c"
+#line 93 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -139,7 +145,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 143 "y.tab.c"
+#line 149 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -429,8 +435,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    23,    23,    26,    27,    28,    29,    30,    33,    34,
-      35,    36
+       0,    29,    29,    32,    33,    34,    35,    36,    39,    40,
+      41,    42
 };
 #endif
 
@@ -1368,14 +1374,35 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 23 "trabalho.y"
+#line 29 "trabalho.y"
     { cout << "Aceito" << endl; }
+    break;
+
+  case 8:
+
+/* Line 1806 of yacc.c  */
+#line 39 "trabalho.y"
+    { cout << "ID: " << (yyvsp[(1) - (1)]).v << endl; }
+    break;
+
+  case 9:
+
+/* Line 1806 of yacc.c  */
+#line 40 "trabalho.y"
+    { cout << "int: " << (yyvsp[(1) - (1)]).v << endl; }
+    break;
+
+  case 10:
+
+/* Line 1806 of yacc.c  */
+#line 41 "trabalho.y"
+    { cout << "double: " << (yyvsp[(1) - (1)]).v << endl; }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1379 "y.tab.c"
+#line 1406 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1606,7 +1633,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 39 "trabalho.y"
+#line 45 "trabalho.y"
 
 int nlinha = 1;
 
