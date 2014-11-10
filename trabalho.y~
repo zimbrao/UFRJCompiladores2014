@@ -25,6 +25,7 @@ struct Atributo {
 };
 
 typedef map< string, Tipo > TS;
+TS ts; // Tabela de simbolos
 
 string geraTemp();
 
@@ -52,7 +53,11 @@ S : VAR ';' S
   ;
 
 VAR : VAR ',' _ID
+      { insereVariavelTS( ts, $1.t, $3.v ); 
+        $$ = $1; }
     | TIPO _ID
+      { insereVariavelTS( ts, $1.t, $2.v ); 
+        $$ = $1; }
     ;
     
 TIPO : _INT
@@ -65,7 +70,7 @@ TIPO : _INT
   
 ATR : _ID '=' E 
     { $$.c = $3.c +
-             $1.v + " = " + $3.v; }
+             $1.v + " = " + $3.v + ";\n"; }
     ;
 
 E : E '+' E   
@@ -90,7 +95,6 @@ F : _ID
 %%
 int nlinha = 1;
 int n_var_temp = 0;
-TS ts; // Tabela de simbolos
 
 #include "lex.yy.c"
 

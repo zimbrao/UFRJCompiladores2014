@@ -94,6 +94,7 @@ struct Atributo {
 };
 
 typedef map< string, Tipo > TS;
+TS ts; // Tabela de simbolos
 
 string geraTemp();
 
@@ -108,7 +109,7 @@ void yyerror(const char *);
 
 
 /* Line 268 of yacc.c  */
-#line 112 "y.tab.c"
+#line 113 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -176,7 +177,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 180 "y.tab.c"
+#line 181 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -470,9 +471,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    49,    49,    50,    51,    54,    55,    58,    59,    60,
-      61,    62,    63,    66,    71,    75,    76,    80,    81,    84,
-      85,    86,    87
+       0,    50,    50,    51,    52,    55,    58,    63,    64,    65,
+      66,    67,    68,    71,    76,    80,    81,    85,    86,    89,
+      90,    91,    92
 };
 #endif
 
@@ -1419,14 +1420,30 @@ yyreduce:
         case 3:
 
 /* Line 1806 of yacc.c  */
-#line 50 "trabalho.y"
+#line 51 "trabalho.y"
     { cout << (yyvsp[(1) - (3)]).c << endl; }
+    break;
+
+  case 5:
+
+/* Line 1806 of yacc.c  */
+#line 56 "trabalho.y"
+    { insereVariavelTS( ts, (yyvsp[(3) - (3)]).v, (yyvsp[(1) - (3)]).t ); 
+        (yyval) = (yyvsp[(1) - (3)]); }
+    break;
+
+  case 6:
+
+/* Line 1806 of yacc.c  */
+#line 59 "trabalho.y"
+    { insereVariavelTS( ts, (yyvsp[(2) - (2)]).v, (yyvsp[(1) - (2)]).t ); 
+        (yyval) = (yyvsp[(1) - (2)]); }
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 67 "trabalho.y"
+#line 72 "trabalho.y"
     { (yyval).c = (yyvsp[(3) - (3)]).c +
              (yyvsp[(1) - (3)]).v + " = " + (yyvsp[(3) - (3)]).v + ";\n"; }
     break;
@@ -1434,7 +1451,7 @@ yyreduce:
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 72 "trabalho.y"
+#line 77 "trabalho.y"
     { (yyval).v = geraTemp();
     (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
            (yyval).v + " = " + (yyvsp[(1) - (3)]).v + " + " + (yyvsp[(3) - (3)]).v + ";\n"; }
@@ -1443,7 +1460,7 @@ yyreduce:
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 77 "trabalho.y"
+#line 82 "trabalho.y"
     { (yyval).v = geraTemp();
     (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
            (yyval).v + " = " + (yyvsp[(1) - (3)]).v + " * " + (yyvsp[(3) - (3)]).v + ";\n"; }
@@ -1452,14 +1469,14 @@ yyreduce:
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 87 "trabalho.y"
+#line 92 "trabalho.y"
     { (yyval) = (yyvsp[(2) - (3)]); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1463 "y.tab.c"
+#line 1480 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1690,11 +1707,10 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 90 "trabalho.y"
+#line 95 "trabalho.y"
 
 int nlinha = 1;
 int n_var_temp = 0;
-TS ts; // Tabela de simbolos
 
 #include "lex.yy.c"
 
