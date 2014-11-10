@@ -39,18 +39,33 @@ void yyerror(const char *);
 %}
 
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
+%token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING
 
 %left '+' '-'
 %left '*' '/'
 
 %%
 
-S : ATR { cout << $1.c << endl; }
+S : VAR ';' S
+  | ATR ';' S { cout << $1.c << endl; }
+  |
   ;
 
+VAR : VAR ',' _ID
+    | TIPO _ID
+    ;
+    
+TIPO : _INT
+     | _CHAR
+     | _BOOL
+     | _DOUBLE
+     | _FLOAT
+     | _STRING
+     ;
+  
 ATR : _ID '=' E 
     { $$.c = $3.c +
-             $1.v + " = " + $3.v; }
+             $1.v + " = " + $3.v + ";\n"; }
     ;
 
 E : E '+' E   
