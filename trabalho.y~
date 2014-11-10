@@ -3,23 +3,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <map>
 
 using namespace std;
 
+struct Tipo {
+  string nome;
+};
+
 struct Atributo {
   string v;  // Valor
-  string t;  // tipo
+  Tipo   t;  // tipo
   string c;  // codigo
   
   Atributo() {}  // inicializacao automatica para vazio ""
   Atributo( string v, string t = "", string c = "" ) {
     this->v = v;
-    this->t = t;
+    this->t.nome = t;
     this->c = c;
   }
 };
 
+typedef map< string, Tipo > TS;
+
 string geraTemp();
+
+void insereVariavelTS( TS*, string nomeVar, Tipo tipo );
+bool buscaVariavelTS( TS*, string nomeVar, Tipo* tipo );
 
 #define YYSTYPE Atributo
 
@@ -35,7 +45,12 @@ void yyerror(const char *);
 
 %%
 
-ATR : _ID '=' E { cout << $3.c << endl; }
+S : ATR { cout << $1.c << endl; }
+  ;
+
+ATR : _ID '=' E 
+    { $$.c = $3.c +
+             $1.v + " = " + $3.v; }
     ;
 
 E : E '+' E   
@@ -81,6 +96,12 @@ void yyerror( const char* st )
 
 string geraTemp() {
   return "temp_" + toStr( ++n_var_temp );
+}
+
+void insereVariavelTS( TS*, string nomeVar, Tipo tipo ) {
+}
+
+bool buscaVariavelTS( TS*, string nomeVar, Tipo* tipo ) {
 }
 
 int main( int argc, char* argv[] )

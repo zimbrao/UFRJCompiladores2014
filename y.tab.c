@@ -72,23 +72,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
+#include <map>
 
 using namespace std;
 
+struct Tipo {
+  string nome;
+};
+
 struct Atributo {
   string v;  // Valor
-  string t;  // tipo
+  Tipo   t;  // tipo
   string c;  // codigo
   
   Atributo() {}  // inicializacao automatica para vazio ""
   Atributo( string v, string t = "", string c = "" ) {
     this->v = v;
-    this->t = t;
+    this->t.nome = t;
     this->c = c;
   }
 };
 
+typedef map< string, Tipo > TS;
+
 string geraTemp();
+
+void insereVariavelTS( TS*, string nomeVar, Tipo tipo );
+bool buscaVariavelTS( TS*, string nomeVar, Tipo* tipo );
 
 #define YYSTYPE Atributo
 
@@ -98,7 +108,7 @@ void yyerror(const char *);
 
 
 /* Line 268 of yacc.c  */
-#line 102 "y.tab.c"
+#line 112 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -154,7 +164,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 158 "y.tab.c"
+#line 168 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -444,8 +454,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    38,    38,    41,    46,    50,    51,    55,    56,    59,
-      60,    61,    62
+       0,    48,    48,    51,    56,    60,    61,    65,    66,    69,
+      70,    71,    72
 };
 #endif
 
@@ -1383,14 +1393,14 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 38 "trabalho.y"
+#line 48 "trabalho.y"
     { cout << (yyvsp[(1) - (1)]).c << endl; }
     break;
 
   case 3:
 
 /* Line 1806 of yacc.c  */
-#line 42 "trabalho.y"
+#line 52 "trabalho.y"
     { (yyval).c = (yyvsp[(3) - (3)]).c +
              (yyvsp[(1) - (3)]).v + " = " + (yyvsp[(3) - (3)]).v; }
     break;
@@ -1398,7 +1408,7 @@ yyreduce:
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 47 "trabalho.y"
+#line 57 "trabalho.y"
     { (yyval).v = geraTemp();
     (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
            (yyval).v + " = " + (yyvsp[(1) - (3)]).v + " + " + (yyvsp[(3) - (3)]).v + ";\n"; }
@@ -1407,7 +1417,7 @@ yyreduce:
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 52 "trabalho.y"
+#line 62 "trabalho.y"
     { (yyval).v = geraTemp();
     (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
            (yyval).v + " = " + (yyvsp[(1) - (3)]).v + " * " + (yyvsp[(3) - (3)]).v + ";\n"; }
@@ -1416,14 +1426,14 @@ yyreduce:
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 62 "trabalho.y"
+#line 72 "trabalho.y"
     { (yyval) = (yyvsp[(2) - (3)]); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1427 "y.tab.c"
+#line 1437 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1654,7 +1664,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 65 "trabalho.y"
+#line 75 "trabalho.y"
 
 int nlinha = 1;
 int n_var_temp = 0;
@@ -1679,6 +1689,12 @@ void yyerror( const char* st )
 
 string geraTemp() {
   return "temp_" + toStr( ++n_var_temp );
+}
+
+void insereVariavelTS( TS*, string nomeVar, Tipo tipo ) {
+}
+
+bool buscaVariavelTS( TS*, string nomeVar, Tipo* tipo ) {
 }
 
 int main( int argc, char* argv[] )
