@@ -28,8 +28,8 @@ typedef map< string, Tipo > TS;
 
 string geraTemp();
 
-void insereVariavelTS( TS*, string nomeVar, Tipo tipo );
-bool buscaVariavelTS( TS*, string nomeVar, Tipo* tipo );
+void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
+bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 
 #define YYSTYPE Atributo
 
@@ -75,6 +75,7 @@ F : _ID
 %%
 int nlinha = 1;
 int n_var_temp = 0;
+TS ts; // Tabela de simbolos
 
 #include "lex.yy.c"
 
@@ -94,16 +95,28 @@ void yyerror( const char* st )
   printf( "Linha: %d\nPerto de: '%s'\n", nlinha, yytext );
 }
 
+void erro( string msg ) {
+  yyerror( msg.c_str() );
+}
+
 string geraTemp() {
   return "temp_" + toStr( ++n_var_temp );
 }
 
-void insereVariavelTS( TS*, string nomeVar, Tipo tipo ) {
-  // TODO
+void insereVariavelTS( TS& ts, string nomeVar, Tipo tipo ) {
+  if( !buscaVariavelTS( ts, nomeVar, &tipo ) )
+    ts[nomeVar] = tipo;
+  else  
+    erro( "Variavel já definida: " + nomeVar );
 }
 
-bool buscaVariavelTS( TS*, string nomeVar, Tipo* tipo ) {
-  // TODO
+bool buscaVariavelTS( TS& ts, string nomeVar, Tipo* tipo ) {
+  if( ts.find( nomeVar ) != ts.end() ) {
+    *tipo = ts[ nomeVar ];
+    return true;
+  }
+  else
+    return false;
 }
 
 int main( int argc, char* argv[] )
