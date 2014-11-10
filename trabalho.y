@@ -9,6 +9,11 @@ using namespace std;
 
 struct Tipo {
   string nome;
+  
+  Tipo() {}
+  Tipo( string nome ) {
+    this->nome = nome;
+  }
 };
 
 struct Atributo {
@@ -27,10 +32,12 @@ struct Atributo {
 typedef map< string, Tipo > TS;
 TS ts; // Tabela de simbolos
 
-string geraTemp();
+Tipo tipoResultado( Tipo a, string operador, Tipo b );
+string geraTemp( Tipo tipo );
 
 void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
 bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
+void erro( string msg );
 
 #define YYSTYPE Atributo
 
@@ -74,12 +81,12 @@ ATR : _ID '=' E
     ;
 
 E : E '+' E   
-  { $$.v = geraTemp();
+  { $$.v = geraTemp( tipoResultado( $1.t, $2.v, $3.t ) );
     $$.c = $1.c + $3.c + 
            $$.v + " = " + $1.v + " + " + $3.v + ";\n"; }
   | E '-' E
   | E '*' E
-  { $$.v = geraTemp();
+  { $$.v = geraTemp( tipoResultado( $1.t, $2.v, $3.t ) );
     $$.c = $1.c + $3.c + 
            $$.v + " = " + $1.v + " * " + $3.v + ";\n"; }
   | E '/' E
@@ -87,14 +94,31 @@ E : E '+' E
   ;
 
 F : _ID		
-  | _CTE_INT    
+  { if( buscaVariavelTS( ts, $1.v, &$$.t ) ) 
+      $$.v = $1.v; 
+    else
+      erro( "Variavel nao declarada: " + $1.v );
+  }	
+  | _CTE_INT 
+  {  $$.v = $1.v; 
+     $$.t = Tipo( "int" ); }
   | _CTE_DOUBLE 
+  {  $$.v = $1.v; 
+     $$.t = Tipo( "double" ); }
   | '(' E ')'  { $$ = $2; }
   ;
 
 %%
 int nlinha = 1;
-int n_var_temp = 0;
+map<string,int> n_var_temp;
+map<string,Tipo> resultadoOperador;
+
+void inicializaResultadoOperador() {
+  resultadoOperador["int+int"] = Tipo( "int" );
+  resultadoOperador["int*int"] = Tipo( "int" );
+  resultadoOperador["double+int"] = Tipo( "double" );
+  // TODO: completar essa lista... :(
+}
 
 #include "lex.yy.c"
 
@@ -116,10 +140,11 @@ void yyerror( const char* st )
 
 void erro( string msg ) {
   yyerror( msg.c_str() );
+  exit(0);
 }
 
-string geraTemp() {
-  return "temp_" + toStr( ++n_var_temp );
+string geraTemp( Tipo tipo ) {
+  return "temp_" + toStr( ++n_var_temp[tipo.nome] );
 }
 
 void insereVariavelTS( TS& ts, string nomeVar, Tipo tipo ) {
@@ -138,7 +163,15 @@ bool buscaVariavelTS( TS& ts, string nomeVar, Tipo* tipo ) {
     return false;
 }
 
+Tipo tipoResultado( Tipo a, string operador, Tipo b ) {
+  if( resultadoOperador.find( a.nome + operador + b.nome ) == resultadoOperador.end() )
+    erro( "Operacao nao permitida: " + a.nome + operador + b.nome );
+
+  return resultadoOperador[a.nome + operador + b.nome];
+}
+
 int main( int argc, char* argv[] )
 {
+  inicializaResultadoOperador();
   yyparse();
 }
