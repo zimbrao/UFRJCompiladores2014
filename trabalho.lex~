@@ -18,8 +18,6 @@ ID      {LETRA}({LETRA}|{NUMERO})*
 "double"		{  yylval = Atributo( "", yytext ); return _DOUBLE; }
 "float"		{  yylval = Atributo( "", yytext ); return _FLOAT; }
 "string"		{  yylval = Atributo( "", yytext ); return _STRING; }
-    
-
 
 {ID}       { yylval = Atributo( yytext ); return _ID; }
 {INT}      { yylval = Atributo( yytext ); return _CTE_INT; }

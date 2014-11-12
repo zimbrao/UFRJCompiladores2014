@@ -108,6 +108,8 @@ void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
 bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
 
+void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 );
+
 #define YYSTYPE Atributo
 
 int yylex();
@@ -116,7 +118,7 @@ void yyerror(const char *);
 
 
 /* Line 268 of yacc.c  */
-#line 120 "y.tab.c"
+#line 122 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -184,7 +186,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 188 "y.tab.c"
+#line 190 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -403,16 +405,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  13
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   35
+#define YYLAST   45
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  23
+#define YYNTOKENS  25
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  22
+#define YYNRULES  23
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  37
+#define YYNSTATES  39
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -428,9 +430,9 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      21,    22,    16,    14,    19,    15,     2,    17,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    18,
-       2,    20,     2,     2,     2,     2,     2,     2,     2,     2,
+      23,    24,    18,    16,    21,    17,     2,    19,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    20,
+      14,    22,    15,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -459,28 +461,28 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     7,    11,    12,    16,    19,    21,    23,
-      25,    27,    29,    31,    35,    39,    43,    47,    51,    53,
-      55,    57,    59
+      25,    27,    29,    31,    35,    39,    43,    47,    51,    55,
+      57,    59,    61,    63
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      24,     0,    -1,    25,    18,    24,    -1,    27,    18,    24,
-      -1,    -1,    25,    19,     7,    -1,    26,     7,    -1,     8,
+      26,     0,    -1,    27,    20,    26,    -1,    29,    20,    26,
+      -1,    -1,    27,    21,     7,    -1,    28,     7,    -1,     8,
       -1,     9,    -1,    10,    -1,    11,    -1,    12,    -1,    13,
-      -1,     7,    20,    28,    -1,    28,    14,    28,    -1,    28,
-      15,    28,    -1,    28,    16,    28,    -1,    28,    17,    28,
-      -1,    29,    -1,     7,    -1,     3,    -1,     5,    -1,    21,
-      28,    22,    -1
+      -1,     7,    22,    30,    -1,    30,    16,    30,    -1,    30,
+      17,    30,    -1,    30,    18,    30,    -1,    30,    19,    30,
+      -1,    30,    14,    30,    -1,    31,    -1,     7,    -1,     3,
+      -1,     5,    -1,    23,    30,    24,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    57,    57,    58,    59,    62,    65,    70,    71,    72,
-      73,    74,    75,    78,    83,    87,    88,    92,    93,    96,
-     102,   105,   108
+       0,    60,    60,    61,    62,    65,    68,    73,    74,    75,
+      76,    77,    78,    81,    98,   100,   102,   104,   106,   108,
+     111,   117,   120,   123
 };
 #endif
 
@@ -491,8 +493,8 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "_CTE_INT", "_CTE_CHAR", "_CTE_DOUBLE",
   "_CTE_STRING", "_ID", "_INT", "_CHAR", "_BOOL", "_DOUBLE", "_FLOAT",
-  "_STRING", "'+'", "'-'", "'*'", "'/'", "';'", "','", "'='", "'('", "')'",
-  "$accept", "S", "VAR", "TIPO", "ATR", "E", "F", 0
+  "_STRING", "'<'", "'>'", "'+'", "'-'", "'*'", "'/'", "';'", "','", "'='",
+  "'('", "')'", "$accept", "S", "VAR", "TIPO", "ATR", "E", "F", 0
 };
 #endif
 
@@ -502,25 +504,25 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,    43,    45,    42,    47,    59,    44,
-      61,    40,    41
+     265,   266,   267,   268,    60,    62,    43,    45,    42,    47,
+      59,    44,    61,    40,    41
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    23,    24,    24,    24,    25,    25,    26,    26,    26,
-      26,    26,    26,    27,    28,    28,    28,    28,    28,    29,
-      29,    29,    29
+       0,    25,    26,    26,    26,    27,    27,    28,    28,    28,
+      28,    28,    28,    29,    30,    30,    30,    30,    30,    30,
+      31,    31,    31,    31
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     3,     3,     0,     3,     2,     1,     1,     1,
-       1,     1,     1,     3,     3,     3,     3,     3,     1,     1,
-       1,     1,     3
+       1,     1,     1,     3,     3,     3,     3,     3,     3,     1,
+       1,     1,     1,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default reduction number in state STATE-NUM.
@@ -529,9 +531,9 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        4,     0,     7,     8,     9,    10,    11,    12,     0,     0,
-       0,     0,     0,     1,     4,     0,     6,     4,    20,    21,
-      19,     0,    13,    18,     2,     5,     3,     0,     0,     0,
-       0,     0,    22,    14,    15,    16,    17
+       0,     0,     0,     1,     4,     0,     6,     4,    21,    22,
+      20,     0,    13,    19,     2,     5,     3,     0,     0,     0,
+       0,     0,     0,    23,    18,    14,    15,    16,    17
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -545,10 +547,10 @@ static const yytype_int8 yydefgoto[] =
 #define YYPACT_NINF -21
 static const yytype_int8 yypact[] =
 {
-      14,   -15,   -21,   -21,   -21,   -21,   -21,   -21,     7,    16,
-      12,    10,    -3,   -21,    14,    26,   -21,    14,   -21,   -21,
-     -21,    -3,    15,   -21,   -21,   -21,   -21,    -2,    -3,    -3,
-      -3,    -3,   -21,     0,     0,   -21,   -21
+      17,   -17,   -21,   -21,   -21,   -21,   -21,   -21,     7,     1,
+      12,    -6,    -3,   -21,    17,    32,   -21,    17,   -21,   -21,
+     -21,    -3,    18,   -21,   -21,   -21,   -21,    -1,    -3,    -3,
+      -3,    -3,    -3,   -21,    24,    26,    26,   -21,   -21
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -561,36 +563,38 @@ static const yytype_int8 yypgoto[] =
    positive, shift that token.  If negative, reduce the rule which
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 #define YYTABLE_NINF -1
-static const yytype_uint8 yytable[] =
+static const yytype_int8 yytable[] =
 {
-      18,    27,    19,    24,    20,    12,    26,    13,    33,    34,
-      35,    36,    28,    29,    30,    31,    30,    31,    21,    16,
-      32,     1,     2,     3,     4,     5,     6,     7,    17,    28,
-      29,    30,    31,    25,    14,    15
+      18,    27,    19,    24,    20,    12,    26,    13,    34,    35,
+      36,    37,    38,    28,    17,    29,    30,    31,    32,    16,
+      21,    14,    15,    33,     1,     2,     3,     4,     5,     6,
+       7,     0,    28,     0,    29,    30,    31,    32,    -1,    25,
+      29,    30,    31,    32,    31,    32
 };
 
 #define yypact_value_is_default(yystate) \
   ((yystate) == (-21))
 
 #define yytable_value_is_error(yytable_value) \
-  YYID (0)
+  ((yytable_value) == (-1))
 
-static const yytype_uint8 yycheck[] =
+static const yytype_int8 yycheck[] =
 {
-       3,    21,     5,    14,     7,    20,    17,     0,    28,    29,
-      30,    31,    14,    15,    16,    17,    16,    17,    21,     7,
-      22,     7,     8,     9,    10,    11,    12,    13,    18,    14,
-      15,    16,    17,     7,    18,    19
+       3,    21,     5,    14,     7,    22,    17,     0,    28,    29,
+      30,    31,    32,    14,    20,    16,    17,    18,    19,     7,
+      23,    20,    21,    24,     7,     8,     9,    10,    11,    12,
+      13,    -1,    14,    -1,    16,    17,    18,    19,    14,     7,
+      16,    17,    18,    19,    18,    19
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     7,     8,     9,    10,    11,    12,    13,    24,    25,
-      26,    27,    20,     0,    18,    19,     7,    18,     3,     5,
-       7,    21,    28,    29,    24,     7,    24,    28,    14,    15,
-      16,    17,    22,    28,    28,    28,    28
+       0,     7,     8,     9,    10,    11,    12,    13,    26,    27,
+      28,    29,    22,     0,    20,    21,     7,    20,     3,     5,
+       7,    23,    30,    31,    26,     7,    26,    30,    14,    16,
+      17,    18,    19,    24,    30,    30,    30,    30,    30
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1427,14 +1431,14 @@ yyreduce:
         case 3:
 
 /* Line 1806 of yacc.c  */
-#line 58 "trabalho.y"
+#line 61 "trabalho.y"
     { cout << (yyvsp[(1) - (3)]).c << endl; }
     break;
 
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 63 "trabalho.y"
+#line 66 "trabalho.y"
     { insereVariavelTS( ts, (yyvsp[(3) - (3)]).v, (yyvsp[(1) - (3)]).t ); 
         (yyval) = (yyvsp[(1) - (3)]); }
     break;
@@ -1442,7 +1446,7 @@ yyreduce:
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 66 "trabalho.y"
+#line 69 "trabalho.y"
     { insereVariavelTS( ts, (yyvsp[(2) - (2)]).v, (yyvsp[(1) - (2)]).t ); 
         (yyval) = (yyvsp[(1) - (2)]); }
     break;
@@ -1450,33 +1454,62 @@ yyreduce:
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 79 "trabalho.y"
-    { (yyval).c = (yyvsp[(3) - (3)]).c +
-             (yyvsp[(1) - (3)]).v + " = " + (yyvsp[(3) - (3)]).v + ";\n"; }
+#line 82 "trabalho.y"
+    { if( buscaVariavelTS( ts, (yyvsp[(1) - (3)]).v, &(yyvsp[(1) - (3)]).t ) ) {
+        if( (yyvsp[(1) - (3)]).t.nome == (yyvsp[(3) - (3)]).t.nome ) {
+          (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
+                 "  " + (yyvsp[(1) - (3)]).v + " = " + (yyvsp[(3) - (3)]).v + ";\n"; 
+        }
+        else
+          erro( "Expressao " + (yyvsp[(3) - (3)]).t.nome + 
+                " nao pode ser atribuida a variavel " +
+                (yyvsp[(1) - (3)]).t.nome );
+      } 
+      else
+        erro( "Variavel nao declarada: " + (yyvsp[(1) - (3)]).v );
+      
+       }
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 84 "trabalho.y"
-    { (yyval).v = geraTemp( tipoResultado( (yyvsp[(1) - (3)]).t, (yyvsp[(2) - (3)]).v, (yyvsp[(3) - (3)]).t ) );
-    (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
-           (yyval).v + " = " + (yyvsp[(1) - (3)]).v + " + " + (yyvsp[(3) - (3)]).v + ";\n"; }
+#line 99 "trabalho.y"
+    { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
+    break;
+
+  case 15:
+
+/* Line 1806 of yacc.c  */
+#line 101 "trabalho.y"
+    { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 89 "trabalho.y"
-    { (yyval).v = geraTemp( tipoResultado( (yyvsp[(1) - (3)]).t, (yyvsp[(2) - (3)]).v, (yyvsp[(3) - (3)]).t ) );
-    (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
-           (yyval).v + " = " + (yyvsp[(1) - (3)]).v + " * " + (yyvsp[(3) - (3)]).v + ";\n"; }
+#line 103 "trabalho.y"
+    { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
-  case 19:
+  case 17:
 
 /* Line 1806 of yacc.c  */
-#line 97 "trabalho.y"
+#line 105 "trabalho.y"
+    { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
+    break;
+
+  case 18:
+
+/* Line 1806 of yacc.c  */
+#line 107 "trabalho.y"
+    { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
+    break;
+
+  case 20:
+
+/* Line 1806 of yacc.c  */
+#line 112 "trabalho.y"
     { if( buscaVariavelTS( ts, (yyvsp[(1) - (1)]).v, &(yyval).t ) ) 
       (yyval).v = (yyvsp[(1) - (1)]).v; 
     else
@@ -1484,33 +1517,33 @@ yyreduce:
   }
     break;
 
-  case 20:
-
-/* Line 1806 of yacc.c  */
-#line 103 "trabalho.y"
-    {  (yyval).v = (yyvsp[(1) - (1)]).v; 
-     (yyval).t = Tipo( "int" ); }
-    break;
-
   case 21:
 
 /* Line 1806 of yacc.c  */
-#line 106 "trabalho.y"
+#line 118 "trabalho.y"
     {  (yyval).v = (yyvsp[(1) - (1)]).v; 
-     (yyval).t = Tipo( "double" ); }
+     (yyval).t = Tipo( "int" ); }
     break;
 
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 108 "trabalho.y"
+#line 121 "trabalho.y"
+    {  (yyval).v = (yyvsp[(1) - (1)]).v; 
+     (yyval).t = Tipo( "double" ); }
+    break;
+
+  case 23:
+
+/* Line 1806 of yacc.c  */
+#line 123 "trabalho.y"
     { (yyval) = (yyvsp[(2) - (3)]); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1514 "y.tab.c"
+#line 1547 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1741,16 +1774,27 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 111 "trabalho.y"
+#line 126 "trabalho.y"
 
 int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
 
+void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 ) {
+  SS->t = tipoResultado( S1.t, S2.v, S3.t );
+  SS->v = geraTemp( SS->t );
+  SS->c = S1.c + S3.c + 
+          "  " + SS->v + " = " + S1.v + " " + S2.v + " " + S3.v + ";\n";
+}
+
 void inicializaResultadoOperador() {
   resultadoOperador["int+int"] = Tipo( "int" );
+  resultadoOperador["int-int"] = Tipo( "int" );
   resultadoOperador["int*int"] = Tipo( "int" );
+  resultadoOperador["int/int"] = Tipo( "int" );
+  resultadoOperador["int<int"] = Tipo( "bool" );
   resultadoOperador["double+int"] = Tipo( "double" );
+  resultadoOperador["int*double"] = Tipo( "double" );
   // TODO: completar essa lista... :(
 }
 
@@ -1778,7 +1822,7 @@ void erro( string msg ) {
 }
 
 string geraTemp( Tipo tipo ) {
-  return "temp_" + toStr( ++n_var_temp[tipo.nome] );
+  return "temp_" + tipo.nome + "_" + toStr( ++n_var_temp[tipo.nome] );
 }
 
 void insereVariavelTS( TS& ts, string nomeVar, Tipo tipo ) {

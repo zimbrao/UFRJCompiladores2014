@@ -39,6 +39,8 @@ void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
 bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
 
+void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 );
+
 #define YYSTYPE Atributo
 
 int yylex();
@@ -49,6 +51,7 @@ void yyerror(const char *);
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
 %token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING
 
+%nonassoc '<' '>'
 %left '+' '-'
 %left '*' '/'
 
@@ -76,20 +79,32 @@ TIPO : _INT
      ;
   
 ATR : _ID '=' E 
-    { $$.c = $3.c +
-             $1.v + " = " + $3.v + ";\n"; }
+    { if( buscaVariavelTS( ts, $1.v, &$1.t ) ) {
+        if( $1.t.nome == $3.t.nome ) {
+          $$.c = $1.c + $3.c + 
+                 "  " + $1.v + " = " + $3.v + ";\n"; 
+        }
+        else
+          erro( "Expressao " + $3.t.nome + 
+                " nao pode ser atribuida a variavel " +
+                $1.t.nome );
+      } 
+      else
+        erro( "Variavel nao declarada: " + $1.v );
+      
+       }
     ;
 
 E : E '+' E   
-  { $$.v = geraTemp( tipoResultado( $1.t, $2.v, $3.t ) );
-    $$.c = $1.c + $3.c + 
-           $$.v + " = " + $1.v + " + " + $3.v + ";\n"; }
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '-' E
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '*' E
-  { $$.v = geraTemp( tipoResultado( $1.t, $2.v, $3.t ) );
-    $$.c = $1.c + $3.c + 
-           $$.v + " = " + $1.v + " * " + $3.v + ";\n"; }
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '/' E
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
+  | E '<' E
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | F
   ;
 
@@ -113,10 +128,21 @@ int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
 
+void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 ) {
+  SS->t = tipoResultado( S1.t, S2.v, S3.t );
+  SS->v = geraTemp( SS->t );
+  SS->c = S1.c + S3.c + 
+          "  " + SS->v + " = " + S1.v + " " + S2.v + " " + S3.v + ";\n";
+}
+
 void inicializaResultadoOperador() {
   resultadoOperador["int+int"] = Tipo( "int" );
+  resultadoOperador["int-int"] = Tipo( "int" );
   resultadoOperador["int*int"] = Tipo( "int" );
+  resultadoOperador["int/int"] = Tipo( "int" );
+  resultadoOperador["int<int"] = Tipo( "bool" );
   resultadoOperador["double+int"] = Tipo( "double" );
+  resultadoOperador["int*double"] = Tipo( "double" );
   // TODO: completar essa lista... :(
 }
 
@@ -144,7 +170,7 @@ void erro( string msg ) {
 }
 
 string geraTemp( Tipo tipo ) {
-  return "temp_" + toStr( ++n_var_temp[tipo.nome] );
+  return "temp_" + tipo.nome + "_" + toStr( ++n_var_temp[tipo.nome] );
 }
 
 void insereVariavelTS( TS& ts, string nomeVar, Tipo tipo ) {
