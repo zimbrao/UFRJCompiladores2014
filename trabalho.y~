@@ -57,17 +57,26 @@ void yyerror(const char *);
 
 %%
 
+S1 : S { cout << $1.c << endl; }
+
 S : VAR ';' S
-  | ATR ';' S { cout << $1.c << endl; }
+    { $$.c = $1.c + $3.c; }
+  | ATR ';' S 
+    { $$.c = $1.c + $3.c; }
   |
+    { $$.c = ""; }
   ;
 
 VAR : VAR ',' _ID
       { insereVariavelTS( ts, $3.v, $1.t ); 
-        $$ = $1; }
+        $$.v = "";
+        $$.t = $1.t;
+        $$.c = $1.c + $1.t.nome + " " + $3.v + ";\n"; }
     | TIPO _ID
       { insereVariavelTS( ts, $2.v, $1.t ); 
-        $$ = $1; }
+        $$.v = "";
+        $$.t = $1.t;
+        $$.c = $1.t.nome + " " + $2.v + ";\n"; }
     ;
     
 TIPO : _INT
@@ -82,7 +91,7 @@ ATR : _ID '=' E
     { if( buscaVariavelTS( ts, $1.v, &$1.t ) ) {
         if( $1.t.nome == $3.t.nome ) {
           $$.c = $1.c + $3.c + 
-                 "  " + $1.v + " = " + $3.v; 
+                 "  " + $1.v + " = " + $3.v + ";\n"; 
         }
         else
           erro( "Expressao " + $3.t.nome + 
