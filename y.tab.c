@@ -103,10 +103,12 @@ TS ts; // Tabela de simbolos
 
 Tipo tipoResultado( Tipo a, string operador, Tipo b );
 string geraTemp( Tipo tipo );
+string geraDeclaracaoTemporarias();
 
 void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
 bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
+string toStr( int n );
 
 void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 );
 
@@ -118,7 +120,7 @@ void yyerror(const char *);
 
 
 /* Line 268 of yacc.c  */
-#line 122 "y.tab.c"
+#line 124 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -186,7 +188,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 190 "y.tab.c"
+#line 192 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -480,9 +482,9 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    60,    60,    62,    64,    67,    70,    76,    83,    84,
-      85,    86,    87,    88,    91,   108,   110,   112,   114,   116,
-     118,   121,   127,   130,   133
+       0,    62,    62,    64,    66,    69,    72,    78,    85,    86,
+      87,    88,    89,    90,    93,   110,   112,   114,   116,   118,
+     120,   123,   129,   132,   135
 };
 #endif
 
@@ -1431,35 +1433,35 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 60 "trabalho.y"
-    { cout << (yyvsp[(1) - (1)]).c << endl; }
+#line 62 "trabalho.y"
+    { cout << geraDeclaracaoTemporarias() << (yyvsp[(1) - (1)]).c << endl; }
     break;
 
   case 3:
-
-/* Line 1806 of yacc.c  */
-#line 63 "trabalho.y"
-    { (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c; }
-    break;
-
-  case 4:
 
 /* Line 1806 of yacc.c  */
 #line 65 "trabalho.y"
     { (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c; }
     break;
 
-  case 5:
+  case 4:
 
 /* Line 1806 of yacc.c  */
 #line 67 "trabalho.y"
+    { (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c; }
+    break;
+
+  case 5:
+
+/* Line 1806 of yacc.c  */
+#line 69 "trabalho.y"
     { (yyval).c = ""; }
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 71 "trabalho.y"
+#line 73 "trabalho.y"
     { insereVariavelTS( ts, (yyvsp[(3) - (3)]).v, (yyvsp[(1) - (3)]).t ); 
         (yyval).v = "";
         (yyval).t = (yyvsp[(1) - (3)]).t;
@@ -1470,7 +1472,7 @@ yyreduce:
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 77 "trabalho.y"
+#line 79 "trabalho.y"
     { insereVariavelTS( ts, (yyvsp[(2) - (2)]).v, (yyvsp[(1) - (2)]).t ); 
         (yyval).v = "";
         (yyval).t = (yyvsp[(1) - (2)]).t;
@@ -1480,7 +1482,7 @@ yyreduce:
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 92 "trabalho.y"
+#line 94 "trabalho.y"
     { if( buscaVariavelTS( ts, (yyvsp[(1) - (3)]).v, &(yyvsp[(1) - (3)]).t ) ) {
         if( (yyvsp[(1) - (3)]).t.nome == (yyvsp[(3) - (3)]).t.nome ) {
           (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
@@ -1500,42 +1502,42 @@ yyreduce:
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 109 "trabalho.y"
+#line 111 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 111 "trabalho.y"
+#line 113 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 113 "trabalho.y"
+#line 115 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 115 "trabalho.y"
+#line 117 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 117 "trabalho.y"
+#line 119 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 21:
 
 /* Line 1806 of yacc.c  */
-#line 122 "trabalho.y"
+#line 124 "trabalho.y"
     { if( buscaVariavelTS( ts, (yyvsp[(1) - (1)]).v, &(yyval).t ) ) 
       (yyval).v = (yyvsp[(1) - (1)]).v; 
     else
@@ -1546,7 +1548,7 @@ yyreduce:
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 128 "trabalho.y"
+#line 130 "trabalho.y"
     {  (yyval).v = (yyvsp[(1) - (1)]).v; 
      (yyval).t = Tipo( "int" ); }
     break;
@@ -1554,7 +1556,7 @@ yyreduce:
   case 23:
 
 /* Line 1806 of yacc.c  */
-#line 131 "trabalho.y"
+#line 133 "trabalho.y"
     {  (yyval).v = (yyvsp[(1) - (1)]).v; 
      (yyval).t = Tipo( "double" ); }
     break;
@@ -1562,14 +1564,14 @@ yyreduce:
   case 24:
 
 /* Line 1806 of yacc.c  */
-#line 133 "trabalho.y"
+#line 135 "trabalho.y"
     { (yyval) = (yyvsp[(2) - (3)]); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1573 "y.tab.c"
+#line 1575 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1800,11 +1802,26 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 136 "trabalho.y"
+#line 138 "trabalho.y"
 
 int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
+
+string geraDeclaracaoTemporarias() {
+  string c;
+  
+  for( int i = 0; i < n_var_temp["bool"]; i++ )
+    c += "  int temp_bool_" + toStr( i + 1 ) + ";\n";
+    
+  for( int i = 0; i < n_var_temp["int"]; i++ )
+    c += "  int temp_int_" + toStr( i + 1 ) + ";\n";
+    
+  for( int i = 0; i < n_var_temp["double"]; i++ )
+    c += "  double temp_double_" + toStr( i + 1 ) + ";\n";
+    
+  return c;  
+}
 
 void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 ) {
   SS->t = tipoResultado( S1.t, S2.v, S3.t );

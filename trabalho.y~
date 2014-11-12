@@ -34,10 +34,12 @@ TS ts; // Tabela de simbolos
 
 Tipo tipoResultado( Tipo a, string operador, Tipo b );
 string geraTemp( Tipo tipo );
+string geraDeclaracaoTemporarias();
 
 void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
 bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
+string toStr( int n );
 
 void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 );
 
@@ -57,7 +59,7 @@ void yyerror(const char *);
 
 %%
 
-S1 : S { cout << $1.c << endl; }
+S1 : S { cout << geraDeclaracaoTemporarias() << $1.c << endl; }
 
 S : VAR ';' S
     { $$.c = $1.c + $3.c; }
@@ -71,12 +73,13 @@ VAR : VAR ',' _ID
       { insereVariavelTS( ts, $3.v, $1.t ); 
         $$.v = "";
         $$.t = $1.t;
-        $$.c = $1.c + $1.t.nome + " " + $3.v + ";\n"; }
+        $$.c = $1.c + 
+               "  " + $1.t.nome + " " + $3.v + ";\n"; }
     | TIPO _ID
       { insereVariavelTS( ts, $2.v, $1.t ); 
         $$.v = "";
         $$.t = $1.t;
-        $$.c = $1.t.nome + " " + $2.v + ";\n"; }
+        $$.c = "  " + $1.t.nome + " " + $2.v + ";\n"; }
     ;
     
 TIPO : _INT
@@ -136,6 +139,21 @@ F : _ID
 int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
+
+string geraDeclaracaoTemporarias() {
+  string c;
+  
+  for( int i = 0; i < n_var_temp["bool"]; i++ )
+    c += "  int temp_bool_" + toStr( i + 1 ) + ";\n";
+    
+  for( int i = 0; i < n_var_temp["int"]; i++ )
+    c += "  int temp_int_" + toStr( i + 1 ) + ";\n";
+    
+  for( int i = 0; i < n_var_temp["double"]; i++ )
+    c += "  double temp_double_" + toStr( i + 1 ) + ";\n";
+    
+  return c;  
+}
 
 void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 ) {
   SS->t = tipoResultado( S1.t, S2.v, S3.t );
