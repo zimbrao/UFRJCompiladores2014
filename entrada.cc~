@@ -1,5 +1,7 @@
 int a, b;
 bool c;
 
-a = (a + b) * (1.0 + 10 * a);
+a = (a + b) * (1 + 10 * a);
 c = a < b;
+
+cout << a + 9;

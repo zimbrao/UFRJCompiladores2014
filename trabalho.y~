@@ -51,7 +51,7 @@ void yyerror(const char *);
 %}
 
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
-%token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING
+%token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING  _COUT _SHIFTL
 
 %nonassoc '<' '>'
 %left '+' '-'
@@ -65,9 +65,17 @@ S : VAR ';' S
     { $$.c = $1.c + $3.c; }
   | ATR ';' S 
     { $$.c = $1.c + $3.c; }
+  | CMD_OUT ';' S  
+    { $$.c = $1.c + $3.c; }
   |
     { $$.c = ""; }
   ;
+  
+CMD_OUT : _COUT _SHIFTL E 
+          { if( $3.t.nome == "int" )
+              $$.c = $3.c + 
+                     "  printf( \"%d\" , " + $3.v + " );\n"; }
+        ;
 
 VAR : VAR ',' _ID
       { insereVariavelTS( ts, $3.v, $1.t ); 
@@ -127,11 +135,14 @@ F : _ID
       erro( "Variavel nao declarada: " + $1.v );
   }	
   | _CTE_INT 
-  {  $$.v = $1.v; 
-     $$.t = Tipo( "int" ); }
+    {  $$.v = $1.v; 
+       $$.t = Tipo( "int" ); }
   | _CTE_DOUBLE 
-  {  $$.v = $1.v; 
-     $$.t = Tipo( "double" ); }
+    {  $$.v = $1.v; 
+       $$.t = Tipo( "double" ); }
+  | _CTE_STRING 
+    {  $$.v = $1.v; 
+       $$.t = Tipo( "string" ); }
   | '(' E ')'  { $$ = $2; }
   ;
 
