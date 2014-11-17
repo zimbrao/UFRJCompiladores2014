@@ -1,11 +1,11 @@
 PROGRAM Principal;
 
 VAR int a, b;
-VAR bool c;
+// VAR bool c;
 
 BEGIN
   a = (a + b) * (1 + 10 * a);
-  c = a < b;
+//  c = a < b;
 
-  cout <<"hello, world";
+  cout <<"hello, world\n";
 END.

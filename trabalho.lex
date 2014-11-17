@@ -6,11 +6,13 @@ INT     {NUMERO}+
 DOUBLE  {NUMERO}+("."{NUMERO}+)
 ID      {LETRA}({LETRA}|{NUMERO})*
 STRING  \"[^"\n]*\"
+COMMENT "//".*
 
 %%
 
-{LINHA}    { nlinha++; }
-{DELIM}    {}
+{LINHA}    	{ nlinha++; }
+{DELIM}    	{}
+{COMMENT}	{}
 
 "int"		{  yylval = Atributo( "", yytext ); return _INT; }
 "char"		{  yylval = Atributo( "", yytext ); return _CHAR; }

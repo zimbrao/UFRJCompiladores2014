@@ -62,7 +62,10 @@ void yyerror(const char *);
 %%
 
 S1 : _PROGRAM _ID ';' DECLS MAIN '.' 
-     { cout << $4.c << $5.c << endl; }
+     { cout << "#include <stdio.h>\n"
+               "#include <stdlib.h>\n"
+               "#include <string.h>\n"
+            << $4.c << $5.c << endl; }
    ;
      
 DECLS : VARGLOBAL DECLS 
@@ -108,12 +111,12 @@ DECLVAR : DECLVAR ',' _ID
             $$.v = "";
             $$.t = $1.t;
             $$.c = $1.c + 
-                   "  " + $1.t.nome + " " + $3.v + ";\n"; }
+                   $1.t.nome + " " + $3.v + ";\n"; }
         | TIPO _ID
           { insereVariavelTS( ts, $2.v, $1.t ); 
             $$.v = "";
             $$.t = $1.t;
-            $$.c = "  " + $1.t.nome + " " + $2.v + ";\n"; }
+            $$.c = $1.t.nome + " " + $2.v + ";\n"; }
         ;
     
 TIPO : _INT
@@ -179,7 +182,12 @@ map<string,Tipo> resultadoOperador;
 
 void geraCodigoFuncaoPrincipal( Atributo* SS, Atributo cmds ) {
   *SS = Atributo();
-  SS->c = geraDeclaracaoTemporarias() + cmds.c;
+  SS->c = "\nint main() {\n" +
+           geraDeclaracaoTemporarias() + 
+           "\n" +
+           cmds.c + 
+           "  return 0;\n" 
+           "}\n";
 }  
 
 string geraDeclaracaoTemporarias() {
