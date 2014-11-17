@@ -5,18 +5,22 @@ int a;
 int b;
 
 int main() {
+  int temp_bool_1;
   int temp_int_1;
-  int temp_int_2;
-  int temp_int_3;
 
   a = 10;
-  b = 3;
-  printf( "%s" , "total: " );
-  temp_int_1 = a * 4;
-  temp_int_2 = b * 2;
-  temp_int_3 = temp_int_1 + temp_int_2;
-  printf( "%d" , temp_int_3 );
-  printf( "%s" , "\n" );
+  b = 13;
+  temp_int_1 = a + 5;
+  temp_bool_1 = temp_int_1 > b;
+  if( temp_bool_1 ) goto if_true;
+  goto if_false;
+  if_true:
+  printf( "%s" , "'a' é maior\n" );
+  goto if_fim;
+  if_false:
+  printf( "%s" , "'b' é maior\n" );
+  if_fim:
+  printf( "%s" , "Fim\n" );
   return 0;
 }
 

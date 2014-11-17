@@ -1,14 +1,16 @@
 PROGRAM Principal;
 
 VAR int a, b;
-// VAR bool c;
 
 BEGIN
   a = 10;
-  b = 3;
-//  c = a < b;
+  b = 13;
 
-  cout << "total: "; 
-  cout << a*4 + b*2;
-  cout << "\n";
+  IF a > b THEN
+    cout << "'a' é maior\n";
+  ELSE  
+    cout << "'b' é maior\n";
+  END IF;
+  
+  cout << "Fim\n";
 END.

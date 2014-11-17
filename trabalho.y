@@ -41,8 +41,14 @@ bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
 string toStr( int n );
 
-void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 );
-void geraCodigoFuncaoPrincipal( Atributo* SS, Atributo cmds );
+void geraCodigoOperadorBinario( Atributo* SS, const Atributo& S1, const Atributo& S2, const Atributo& S3 );
+void geraCodigoFuncaoPrincipal( Atributo* SS, const Atributo& cmds );
+void geraCodigoIfComElse( Atributo* SS, const Atributo& expr, 
+                                        const Atributo& cmdsThen,
+                                        const Atributo& cmdsElse );
+void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr, 
+                                        const Atributo& cmdsThen );
+// Usando const Atributo& não cria cópia desnecessária
 
 #define YYSTYPE Atributo
 
@@ -53,7 +59,7 @@ void yyerror(const char *);
 
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
 %token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING  _COUT _SHIFTL
-%token _PROGRAM _VAR _BEGIN _END _FUNCTION
+%token _PROGRAM _VAR _BEGIN _END _FUNCTION _IF _THEN _ELSE
 
 %nonassoc '<' '>'
 %left '+' '-'
@@ -93,9 +99,17 @@ CMDS : ATR ';' CMDS
        { $$.c = $1.c + $3.c; }
      | CMD_OUT ';' CMDS  
        { $$.c = $1.c + $3.c; }
+     | CMD_IF ';' CMDS  
+       { $$.c = $1.c + $3.c; }
      |
        { $$ = Atributo(); }
      ;
+  
+CMD_IF : _IF E _THEN CMDS _END _IF
+         { geraCodigoIfSemElse( &$$, $2, $4 ); }
+       | _IF E _THEN CMDS _ELSE CMDS _END _IF
+         { geraCodigoIfComElse( &$$, $2, $4, $6 ); }
+       ;
   
 CMD_OUT : _COUT _SHIFTL E 
           { if( $3.t.nome == "int" )
@@ -154,6 +168,8 @@ E : E '+' E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '<' E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
+  | E '>' E
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | F
   ;
 
@@ -180,7 +196,25 @@ int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
 
-void geraCodigoFuncaoPrincipal( Atributo* SS, Atributo cmds ) {
+void geraCodigoIfComElse( Atributo* SS, const Atributo& expr, 
+                                        const Atributo& cmdsThen,
+                                        const Atributo& cmdsElse ) {
+  *SS = Atributo();
+  SS->c = expr.c + 
+          "  if( " + expr.v + " ) goto if_true;\n" +
+          "  goto if_false;\n" +
+          "  if_true:\n" + cmdsThen.c +
+          "  goto if_fim;\n" +
+          "  if_false:\n" + cmdsElse.c +
+          "  if_fim:\n";
+}
+
+void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr, 
+                                        const Atributo& cmdsThen ) {
+}
+
+
+void geraCodigoFuncaoPrincipal( Atributo* SS, const Atributo& cmds ) {
   *SS = Atributo();
   SS->c = "\nint main() {\n" +
            geraDeclaracaoTemporarias() + 
@@ -205,7 +239,7 @@ string geraDeclaracaoTemporarias() {
   return c;  
 }
 
-void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 ) {
+void geraCodigoOperadorBinario( Atributo* SS, const Atributo& S1, const Atributo& S2, const Atributo& S3 ) {
   SS->t = tipoResultado( S1.t, S2.v, S3.t );
   SS->v = geraTemp( SS->t );
   SS->c = S1.c + S3.c + 
@@ -218,6 +252,7 @@ void inicializaResultadoOperador() {
   resultadoOperador["int*int"] = Tipo( "int" );
   resultadoOperador["int/int"] = Tipo( "int" );
   resultadoOperador["int<int"] = Tipo( "bool" );
+  resultadoOperador["int>int"] = Tipo( "bool" );
   resultadoOperador["double+int"] = Tipo( "double" );
   resultadoOperador["int*double"] = Tipo( "double" );
   // TODO: completar essa lista... :(

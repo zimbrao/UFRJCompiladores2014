@@ -32,6 +32,9 @@ COMMENT "//".*
 "BEGIN"		{ yylval = Atributo( yytext ); return _BEGIN; }
 "END"		{ yylval = Atributo( yytext ); return _END; }
 "FUNCTION"	{ yylval = Atributo( yytext ); return _FUNCTION; }
+"IF"		{ yylval = Atributo( yytext ); return _IF; }
+"THEN"		{ yylval = Atributo( yytext ); return _THEN; }
+"ELSE"		{ yylval = Atributo( yytext ); return _ELSE; }
 
 
 {ID}       { yylval = Atributo( yytext ); return _ID; }
