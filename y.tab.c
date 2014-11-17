@@ -111,6 +111,7 @@ void erro( string msg );
 string toStr( int n );
 
 void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 );
+void geraCodigoFuncaoPrincipal( Atributo* SS, Atributo cmds );
 
 #define YYSTYPE Atributo
 
@@ -120,7 +121,7 @@ void yyerror(const char *);
 
 
 /* Line 268 of yacc.c  */
-#line 124 "y.tab.c"
+#line 125 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -202,7 +203,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 206 "y.tab.c"
+#line 207 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -501,7 +502,7 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    63,    63,    67,    70,    74,    77,    81,    84,    89,
+       0,    64,    64,    68,    71,    75,    78,    82,    85,    89,
       91,    94,    97,   106,   112,   119,   120,   121,   122,   123,
      124,   127,   144,   146,   148,   150,   152,   154,   157,   163,
      166,   169,   172
@@ -1468,14 +1469,14 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 64 "trabalho.y"
+#line 65 "trabalho.y"
     { cout << (yyvsp[(4) - (6)]).c << (yyvsp[(5) - (6)]).c << endl; }
     break;
 
   case 3:
 
 /* Line 1806 of yacc.c  */
-#line 68 "trabalho.y"
+#line 69 "trabalho.y"
     { (yyval) = Atributo();
           (yyval).c = (yyvsp[(1) - (2)]).c + (yyvsp[(2) - (2)]).c; }
     break;
@@ -1483,7 +1484,7 @@ yyreduce:
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 71 "trabalho.y"
+#line 72 "trabalho.y"
     { (yyval) = Atributo();
           (yyval).c = (yyvsp[(1) - (2)]).c + (yyvsp[(2) - (2)]).c; }
     break;
@@ -1491,23 +1492,22 @@ yyreduce:
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 74 "trabalho.y"
+#line 75 "trabalho.y"
     { (yyval) = Atributo(); }
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 78 "trabalho.y"
-    { (yyval) = (yyvsp[(1) - (3)]); }
+#line 79 "trabalho.y"
+    { (yyval) = (yyvsp[(2) - (3)]); }
     break;
 
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 85 "trabalho.y"
-    { (yyval) = Atributo();
-         (yyval).c = geraDeclaracaoTemporarias() + (yyvsp[(2) - (3)]).c; }
+#line 86 "trabalho.y"
+    { geraCodigoFuncaoPrincipal( &(yyval), (yyvsp[(2) - (3)]) ); }
     break;
 
   case 9:
@@ -1900,6 +1900,11 @@ yyreturn:
 int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
+
+void geraCodigoFuncaoPrincipal( Atributo* SS, Atributo cmds ) {
+  *SS = Atributo();
+  SS->c = geraDeclaracaoTemporarias() + cmds.c;
+}  
 
 string geraDeclaracaoTemporarias() {
   string c;

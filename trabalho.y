@@ -42,6 +42,7 @@ void erro( string msg );
 string toStr( int n );
 
 void geraCodigoOperadorBinario( Atributo* SS, Atributo S1, Atributo S2, Atributo S3 );
+void geraCodigoFuncaoPrincipal( Atributo* SS, Atributo cmds );
 
 #define YYSTYPE Atributo
 
@@ -75,15 +76,14 @@ DECLS : VARGLOBAL DECLS
       ;
       
 VARGLOBAL : _VAR DECLVAR ';'
-            { $$ = $1; }
+            { $$ = $2; }
           ;
 
 FUNC : _FUNCTION
      ; 
 
 MAIN : _BEGIN CMDS _END
-       { $$ = Atributo();
-         $$.c = geraDeclaracaoTemporarias() + $2.c; }
+       { geraCodigoFuncaoPrincipal( &$$, $2 ); }
      ; 
 
 CMDS : ATR ';' CMDS 
@@ -176,6 +176,11 @@ F : _ID
 int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
+
+void geraCodigoFuncaoPrincipal( Atributo* SS, Atributo cmds ) {
+  *SS = Atributo();
+  SS->c = geraDeclaracaoTemporarias() + cmds.c;
+}  
 
 string geraDeclaracaoTemporarias() {
   string c;
