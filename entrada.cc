@@ -4,8 +4,11 @@ VAR int a, b;
 // VAR bool c;
 
 BEGIN
-  a = (a + b) * (1 + 10 * a);
+  a = 10;
+  b = 3;
 //  c = a < b;
 
-  cout <<"hello, world\n";
+  cout << "total: "; 
+  cout << a*4 + b*2;
+  cout << "\n";
 END.
