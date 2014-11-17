@@ -22,11 +22,17 @@ STRING  \"[^"\n]*\"
 "<<" 		{  yylval = Atributo( yytext ); return _SHIFTL; }
 "cout"		{  yylval = Atributo( yytext ); return _COUT; }
 
-{ID}       { yylval = Atributo( yytext ); return _ID; }
-{INT}      { yylval = Atributo( yytext ); return _CTE_INT; }
-{DOUBLE}   { yylval = Atributo( yytext ); return _CTE_DOUBLE; }
-{STRING}   { yylval = Atributo( yytext ); return _CTE_STRING; }
+{INT}      	{ yylval = Atributo( yytext ); return _CTE_INT; }
+{DOUBLE}   	{ yylval = Atributo( yytext ); return _CTE_DOUBLE; }
+{STRING}   	{ yylval = Atributo( yytext ); return _CTE_STRING; }
+"PROGRAM"	{ yylval = Atributo( yytext ); return _PROGRAM; }
+"VAR"		{ yylval = Atributo( yytext ); return _VAR; }
+"BEGIN"		{ yylval = Atributo( yytext ); return _BEGIN; }
+"END"		{ yylval = Atributo( yytext ); return _END; }
+"FUNCTION"	{ yylval = Atributo( yytext ); return _FUNCTION; }
 
+
+{ID}       { yylval = Atributo( yytext ); return _ID; }
 .          { yylval = Atributo( yytext ); return *yytext; }
 
 %%

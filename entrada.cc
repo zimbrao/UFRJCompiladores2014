@@ -1,7 +1,11 @@
-int a, b;
-bool c;
+PROGRAM Principal;
 
-a = (a + b) * (1 + 10 * a);
-c = a < b;
+VAR int a, b;
+VAR bool c;
 
-cout <<"hello, world";
+BEGIN
+  a = (a + b) * (1 + 10 * a);
+  c = a < b;
+
+  cout <<"hello, world";
+END.

@@ -52,6 +52,7 @@ void yyerror(const char *);
 
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
 %token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING  _COUT _SHIFTL
+%token _PROGRAM _VAR _BEGIN _END _FUNCTION
 
 %nonassoc '<' '>'
 %left '+' '-'
@@ -59,17 +60,39 @@ void yyerror(const char *);
 
 %%
 
-S1 : S { cout << geraDeclaracaoTemporarias() << $1.c << endl; }
+S1 : _PROGRAM _ID ';' DECLS MAIN '.' 
+     { cout << $4.c << $5.c << endl; }
+   ;
+     
+DECLS : VARGLOBAL DECLS 
+        { $$ = Atributo();
+          $$.c = $1.c + $2.c; }        
+      | FUNC DECLS
+        { $$ = Atributo();
+          $$.c = $1.c + $2.c; }    
+      |
+        { $$ = Atributo(); }
+      ;
+      
+VARGLOBAL : _VAR DECLVAR ';'
+            { $$ = $1; }
+          ;
 
-S : VAR ';' S
-    { $$.c = $1.c + $3.c; }
-  | ATR ';' S 
-    { $$.c = $1.c + $3.c; }
-  | CMD_OUT ';' S  
-    { $$.c = $1.c + $3.c; }
-  |
-    { $$.c = ""; }
-  ;
+FUNC : _FUNCTION
+     ; 
+
+MAIN : _BEGIN CMDS _END
+       { $$ = Atributo();
+         $$.c = geraDeclaracaoTemporarias() + $2.c; }
+     ; 
+
+CMDS : ATR ';' CMDS 
+       { $$.c = $1.c + $3.c; }
+     | CMD_OUT ';' CMDS  
+       { $$.c = $1.c + $3.c; }
+     |
+       { $$ = Atributo(); }
+     ;
   
 CMD_OUT : _COUT _SHIFTL E 
           { if( $3.t.nome == "int" )
@@ -80,18 +103,18 @@ CMD_OUT : _COUT _SHIFTL E
                      "  printf( \"%s\" , " + $3.v + " );\n";}
         ;
 
-VAR : VAR ',' _ID
-      { insereVariavelTS( ts, $3.v, $1.t ); 
-        $$.v = "";
-        $$.t = $1.t;
-        $$.c = $1.c + 
-               "  " + $1.t.nome + " " + $3.v + ";\n"; }
-    | TIPO _ID
-      { insereVariavelTS( ts, $2.v, $1.t ); 
-        $$.v = "";
-        $$.t = $1.t;
-        $$.c = "  " + $1.t.nome + " " + $2.v + ";\n"; }
-    ;
+DECLVAR : DECLVAR ',' _ID
+          { insereVariavelTS( ts, $3.v, $1.t ); 
+            $$.v = "";
+            $$.t = $1.t;
+            $$.c = $1.c + 
+                   "  " + $1.t.nome + " " + $3.v + ";\n"; }
+        | TIPO _ID
+          { insereVariavelTS( ts, $2.v, $1.t ); 
+            $$.v = "";
+            $$.t = $1.t;
+            $$.c = "  " + $1.t.nome + " " + $2.v + ";\n"; }
+        ;
     
 TIPO : _INT
      | _CHAR
