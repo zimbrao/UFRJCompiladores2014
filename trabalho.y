@@ -18,6 +18,8 @@
 
 using namespace std;
 
+const int MAX_STR = 256;
+
 struct Tipo {
   string nome;
   
@@ -59,6 +61,10 @@ void geraCodigoIfComElse( Atributo* SS, const Atributo& expr,
                                         const Atributo& cmdsElse );
 void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr, 
                                         const Atributo& cmdsThen );
+
+void geraDeclaracaoVariavel( Atributo* SS, const Atributo& tipo,
+                                           const Atributo& id );
+                                           
 // Usando const Atributo& não cria cópia desnecessária
 
 #define YYSTYPE Atributo
@@ -133,15 +139,10 @@ CMD_OUT : _COUT _SHIFTL E
 
 DECLVAR : DECLVAR ',' _ID
           { insereVariavelTS( ts, $3.v, $1.t ); 
-            $$.v = "";
-            $$.t = $1.t;
-            $$.c = $1.c + 
-                   $1.t.nome + " " + $3.v + ";\n"; }
+            geraDeclaracaoVariavel( &$$, $1, $3 ); }
         | TIPO _ID
           { insereVariavelTS( ts, $2.v, $1.t ); 
-            $$.v = "";
-            $$.t = $1.t;
-            $$.c = $1.t.nome + " " + $2.v + ";\n"; }
+            geraDeclaracaoVariavel( &$$, $1, $2 ); }
         ;
     
 TIPO : _INT
@@ -224,6 +225,20 @@ void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr,
                                         const Atributo& cmdsThen ) {
 }
 
+
+void geraDeclaracaoVariavel( Atributo* SS, const Atributo& tipo,
+                                           const Atributo& id ) {
+  SS->v = "";
+  SS->t = tipo.t;
+  if( tipo.t.nome == "string" ) {
+    SS->c = tipo.c + 
+           "char " + id.v + "["+ toStr( MAX_STR ) +"];\n";   
+  }
+  else {
+    SS->c = tipo.c + 
+            tipo.t.nome + " " + id.v + ";\n";
+  }
+}
 
 void geraCodigoFuncaoPrincipal( Atributo* SS, const Atributo& cmds ) {
   *SS = Atributo();

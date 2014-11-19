@@ -17,9 +17,9 @@ COMMENT "//".*
 "int"		{  yylval = Atributo( "", yytext ); return _INT; }
 "char"		{  yylval = Atributo( "", yytext ); return _CHAR; }
 "bool"		{  yylval = Atributo( "", yytext ); return _BOOL; }
-"double"		{  yylval = Atributo( "", yytext ); return _DOUBLE; }
+"double"	{  yylval = Atributo( "", yytext ); return _DOUBLE; }
 "float"		{  yylval = Atributo( "", yytext ); return _FLOAT; }
-"string"		{  yylval = Atributo( "", yytext ); return _STRING; }
+"string"	{  yylval = Atributo( "", yytext ); return _STRING; }
 
 "<<" 		{  yylval = Atributo( yytext ); return _SHIFTL; }
 "cout"		{  yylval = Atributo( yytext ); return _COUT; }

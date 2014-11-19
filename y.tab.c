@@ -74,7 +74,20 @@
 #include <iostream>
 #include <map>
 
+/*
+ * Programa exemplo deum compilador para o curso de Compiladores-2014-2 - Zimbrão
+ * TODO:
+ * - variavel do tipo boolean
+ * - Funções e parametros
+ * - Variaveis locais
+ * - Array
+ * - pipes
+ *
+ */
+
 using namespace std;
+
+const int MAX_STR = 256;
 
 struct Tipo {
   string nome;
@@ -117,6 +130,10 @@ void geraCodigoIfComElse( Atributo* SS, const Atributo& expr,
                                         const Atributo& cmdsElse );
 void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr, 
                                         const Atributo& cmdsThen );
+
+void geraDeclaracaoVariavel( Atributo* SS, const Atributo& tipo,
+                                           const Atributo& id );
+                                           
 // Usando const Atributo& não cria cópia desnecessária
 
 #define YYSTYPE Atributo
@@ -127,7 +144,7 @@ void yyerror(const char *);
 
 
 /* Line 268 of yacc.c  */
-#line 131 "y.tab.c"
+#line 148 "y.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -215,7 +232,7 @@ typedef int YYSTYPE;
 
 
 /* Line 343 of yacc.c  */
-#line 219 "y.tab.c"
+#line 236 "y.tab.c"
 
 #ifdef short
 # undef short
@@ -517,10 +534,10 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    70,    70,    77,    80,    84,    87,    91,    94,    98,
-     100,   102,   105,   108,   110,   114,   123,   129,   136,   137,
-     138,   139,   140,   141,   144,   161,   163,   165,   167,   169,
-     171,   173,   176,   182,   185,   188,   191
+       0,    87,    87,    94,    97,   101,   104,   108,   111,   115,
+     117,   119,   122,   125,   127,   131,   140,   143,   148,   149,
+     150,   151,   152,   153,   156,   173,   175,   177,   179,   181,
+     183,   185,   188,   194,   197,   200,   203
 };
 #endif
 
@@ -1497,7 +1514,7 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 71 "trabalho.y"
+#line 88 "trabalho.y"
     { cout << "#include <stdio.h>\n"
                "#include <stdlib.h>\n"
                "#include <string.h>\n"
@@ -1507,7 +1524,7 @@ yyreduce:
   case 3:
 
 /* Line 1806 of yacc.c  */
-#line 78 "trabalho.y"
+#line 95 "trabalho.y"
     { (yyval) = Atributo();
           (yyval).c = (yyvsp[(1) - (2)]).c + (yyvsp[(2) - (2)]).c; }
     break;
@@ -1515,7 +1532,7 @@ yyreduce:
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 81 "trabalho.y"
+#line 98 "trabalho.y"
     { (yyval) = Atributo();
           (yyval).c = (yyvsp[(1) - (2)]).c + (yyvsp[(2) - (2)]).c; }
     break;
@@ -1523,70 +1540,70 @@ yyreduce:
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 84 "trabalho.y"
+#line 101 "trabalho.y"
     { (yyval) = Atributo(); }
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 88 "trabalho.y"
+#line 105 "trabalho.y"
     { (yyval) = (yyvsp[(2) - (3)]); }
     break;
 
   case 8:
 
 /* Line 1806 of yacc.c  */
-#line 95 "trabalho.y"
+#line 112 "trabalho.y"
     { geraCodigoFuncaoPrincipal( &(yyval), (yyvsp[(2) - (3)]) ); }
     break;
 
   case 9:
 
 /* Line 1806 of yacc.c  */
-#line 99 "trabalho.y"
+#line 116 "trabalho.y"
     { (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c; }
     break;
 
   case 10:
 
 /* Line 1806 of yacc.c  */
-#line 101 "trabalho.y"
+#line 118 "trabalho.y"
     { (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c; }
     break;
 
   case 11:
 
 /* Line 1806 of yacc.c  */
-#line 103 "trabalho.y"
+#line 120 "trabalho.y"
     { (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c; }
     break;
 
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 105 "trabalho.y"
+#line 122 "trabalho.y"
     { (yyval) = Atributo(); }
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 109 "trabalho.y"
+#line 126 "trabalho.y"
     { geraCodigoIfSemElse( &(yyval), (yyvsp[(2) - (6)]), (yyvsp[(4) - (6)]) ); }
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 111 "trabalho.y"
+#line 128 "trabalho.y"
     { geraCodigoIfComElse( &(yyval), (yyvsp[(2) - (8)]), (yyvsp[(4) - (8)]), (yyvsp[(6) - (8)]) ); }
     break;
 
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 115 "trabalho.y"
+#line 132 "trabalho.y"
     { if( (yyvsp[(3) - (3)]).t.nome == "int" )
               (yyval).c = (yyvsp[(3) - (3)]).c + 
                      "  printf( \"%d\" , " + (yyvsp[(3) - (3)]).v + " );\n";
@@ -1598,28 +1615,23 @@ yyreduce:
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 124 "trabalho.y"
+#line 141 "trabalho.y"
     { insereVariavelTS( ts, (yyvsp[(3) - (3)]).v, (yyvsp[(1) - (3)]).t ); 
-            (yyval).v = "";
-            (yyval).t = (yyvsp[(1) - (3)]).t;
-            (yyval).c = (yyvsp[(1) - (3)]).c + 
-                   (yyvsp[(1) - (3)]).t.nome + " " + (yyvsp[(3) - (3)]).v + ";\n"; }
+            geraDeclaracaoVariavel( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 130 "trabalho.y"
+#line 144 "trabalho.y"
     { insereVariavelTS( ts, (yyvsp[(2) - (2)]).v, (yyvsp[(1) - (2)]).t ); 
-            (yyval).v = "";
-            (yyval).t = (yyvsp[(1) - (2)]).t;
-            (yyval).c = (yyvsp[(1) - (2)]).t.nome + " " + (yyvsp[(2) - (2)]).v + ";\n"; }
+            geraDeclaracaoVariavel( &(yyval), (yyvsp[(1) - (2)]), (yyvsp[(2) - (2)]) ); }
     break;
 
   case 24:
 
 /* Line 1806 of yacc.c  */
-#line 145 "trabalho.y"
+#line 157 "trabalho.y"
     { if( buscaVariavelTS( ts, (yyvsp[(1) - (3)]).v, &(yyvsp[(1) - (3)]).t ) ) {
         if( (yyvsp[(1) - (3)]).t.nome == (yyvsp[(3) - (3)]).t.nome ) {
           (yyval).c = (yyvsp[(1) - (3)]).c + (yyvsp[(3) - (3)]).c + 
@@ -1639,49 +1651,49 @@ yyreduce:
   case 25:
 
 /* Line 1806 of yacc.c  */
-#line 162 "trabalho.y"
+#line 174 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 26:
 
 /* Line 1806 of yacc.c  */
-#line 164 "trabalho.y"
+#line 176 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 27:
 
 /* Line 1806 of yacc.c  */
-#line 166 "trabalho.y"
+#line 178 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 28:
 
 /* Line 1806 of yacc.c  */
-#line 168 "trabalho.y"
+#line 180 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 29:
 
 /* Line 1806 of yacc.c  */
-#line 170 "trabalho.y"
+#line 182 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 30:
 
 /* Line 1806 of yacc.c  */
-#line 172 "trabalho.y"
+#line 184 "trabalho.y"
     { geraCodigoOperadorBinario( &(yyval), (yyvsp[(1) - (3)]), (yyvsp[(2) - (3)]), (yyvsp[(3) - (3)]) ); }
     break;
 
   case 32:
 
 /* Line 1806 of yacc.c  */
-#line 177 "trabalho.y"
+#line 189 "trabalho.y"
     { if( buscaVariavelTS( ts, (yyvsp[(1) - (1)]).v, &(yyval).t ) ) 
       (yyval).v = (yyvsp[(1) - (1)]).v; 
     else
@@ -1692,7 +1704,7 @@ yyreduce:
   case 33:
 
 /* Line 1806 of yacc.c  */
-#line 183 "trabalho.y"
+#line 195 "trabalho.y"
     {  (yyval).v = (yyvsp[(1) - (1)]).v; 
        (yyval).t = Tipo( "int" ); }
     break;
@@ -1700,7 +1712,7 @@ yyreduce:
   case 34:
 
 /* Line 1806 of yacc.c  */
-#line 186 "trabalho.y"
+#line 198 "trabalho.y"
     {  (yyval).v = (yyvsp[(1) - (1)]).v; 
        (yyval).t = Tipo( "double" ); }
     break;
@@ -1708,7 +1720,7 @@ yyreduce:
   case 35:
 
 /* Line 1806 of yacc.c  */
-#line 189 "trabalho.y"
+#line 201 "trabalho.y"
     {  (yyval).v = (yyvsp[(1) - (1)]).v; 
        (yyval).t = Tipo( "string" ); }
     break;
@@ -1716,14 +1728,14 @@ yyreduce:
   case 36:
 
 /* Line 1806 of yacc.c  */
-#line 191 "trabalho.y"
+#line 203 "trabalho.y"
     { (yyval) = (yyvsp[(2) - (3)]); }
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1727 "y.tab.c"
+#line 1739 "y.tab.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1954,7 +1966,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 194 "trabalho.y"
+#line 206 "trabalho.y"
 
 int nlinha = 1;
 map<string,int> n_var_temp;
@@ -1977,6 +1989,20 @@ void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr,
                                         const Atributo& cmdsThen ) {
 }
 
+
+void geraDeclaracaoVariavel( Atributo* SS, const Atributo& tipo,
+                                           const Atributo& id ) {
+  SS->v = "";
+  SS->t = tipo.t;
+  if( tipo.t.nome == "string" ) {
+    SS->c = tipo.c + 
+           "char " + id.v + "["+ toStr( MAX_STR ) +"];\n";   
+  }
+  else {
+    SS->c = tipo.c + 
+            tipo.t.nome + " " + id.v + ";\n";
+  }
+}
 
 void geraCodigoFuncaoPrincipal( Atributo* SS, const Atributo& cmds ) {
   *SS = Atributo();
