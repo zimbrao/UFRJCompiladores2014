@@ -1,10 +1,12 @@
 PROGRAM Principal;
 
-VAR string a;
+VAR string a, b, c;
 
 BEGIN
-  a = "hello, world";
-  
-  cout << a;
+  a = "hello";
+  b = "world";
+
+  c = a + ", " + b;
+  cout << c;
   cout << "\n";
 END.

@@ -6,7 +6,7 @@
 #include <map>
 
 /*
- * Programa exemplo deum compilador para o curso de Compiladores-2014-2 - Zimbrão
+ * Programa exemplo de um compilador para o curso de Compiladores-2014-2 - Zimbrão
  * TODO:
  * - variavel do tipo boolean
  * - Funções e parametros
@@ -270,9 +270,18 @@ string geraDeclaracaoTemporarias() {
     
   for( int i = 0; i < n_var_temp["int"]; i++ )
     c += "  int temp_int_" + toStr( i + 1 ) + ";\n";
+
+    for( int i = 0; i < n_var_temp["char"]; i++ )
+    c += "  char temp_char_" + toStr( i + 1 ) + ";\n";
     
   for( int i = 0; i < n_var_temp["double"]; i++ )
     c += "  double temp_double_" + toStr( i + 1 ) + ";\n";
+
+    for( int i = 0; i < n_var_temp["float"]; i++ )
+    c += "  float temp_float_" + toStr( i + 1 ) + ";\n";
+    
+  for( int i = 0; i < n_var_temp["string"]; i++ )
+    c += "  char temp_string_" + toStr( i + 1 ) + "[" + toStr( MAX_STR )+ "];\n";
     
   return c;  
 }
@@ -280,11 +289,22 @@ string geraDeclaracaoTemporarias() {
 void geraCodigoOperadorBinario( Atributo* SS, const Atributo& S1, const Atributo& S2, const Atributo& S3 ) {
   SS->t = tipoResultado( S1.t, S2.v, S3.t );
   SS->v = geraTemp( SS->t );
-  SS->c = S1.c + S3.c + 
-          "  " + SS->v + " = " + S1.v + " " + S2.v + " " + S3.v + ";\n";
+
+  if( SS->t.nome == "string" ) {
+    SS->c = S1.c + S3.c + 
+            "\n  strncpy( " + SS->v + ", " + S1.v + ", " + 
+                        toStr( MAX_STR - 1 ) + " );\n" +
+            "  strncat( " + SS->v + ", " + S3.v + ", " + 
+                        toStr( MAX_STR - 1 ) + " );\n" +
+            "  " + SS->v + "[" + toStr( MAX_STR - 1 ) + "] = 0;\n\n";    
+  }
+  else
+    SS->c = S1.c + S3.c + 
+            "  " + SS->v + " = " + S1.v + " " + S2.v + " " + S3.v + ";\n";
 }
 
 void inicializaResultadoOperador() {
+  resultadoOperador["string+string"] = Tipo( "string" );
   resultadoOperador["int+int"] = Tipo( "int" );
   resultadoOperador["int-int"] = Tipo( "int" );
   resultadoOperador["int*int"] = Tipo( "int" );
