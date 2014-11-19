@@ -54,6 +54,8 @@ bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
 string toStr( int n );
 
+
+void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue, const Atributo& rvalue );
 void geraCodigoOperadorBinario( Atributo* SS, const Atributo& S1, const Atributo& S2, const Atributo& S3 );
 void geraCodigoFuncaoPrincipal( Atributo* SS, const Atributo& cmds );
 void geraCodigoIfComElse( Atributo* SS, const Atributo& expr, 
@@ -87,7 +89,7 @@ void yyerror(const char *);
 S1 : _PROGRAM _ID ';' DECLS MAIN '.' 
      { cout << "#include <stdio.h>\n"
                "#include <stdlib.h>\n"
-               "#include <string.h>\n"
+               "#include <string.h>\n\n"
             << $4.c << $5.c << endl; }
    ;
      
@@ -154,20 +156,7 @@ TIPO : _INT
      ;
   
 ATR : _ID '=' E 
-    { if( buscaVariavelTS( ts, $1.v, &$1.t ) ) {
-        if( $1.t.nome == $3.t.nome ) {
-          $$.c = $1.c + $3.c + 
-                 "  " + $1.v + " = " + $3.v + ";\n"; 
-        }
-        else
-          erro( "Expressao " + $3.t.nome + 
-                " nao pode ser atribuida a variavel " +
-                $1.t.nome );
-      } 
-      else
-        erro( "Variavel nao declarada: " + $1.v );
-      
-       }
+      { geraCodigoAtribuicao( &$$, $1, $3 ); }
     ;
 
 E : E '+' E   
@@ -208,6 +197,29 @@ int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
 
+void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue, 
+                                         const Atributo& rvalue ) {
+  if( buscaVariavelTS( ts, lvalue.v, &lvalue.t ) ) {
+    if( lvalue.t.nome == rvalue.t.nome ) {
+      if( lvalue.t.nome == "string" ) {
+        SS->c = lvalue.c + rvalue.c + 
+                "  strncpy( " + lvalue.v + ", " + rvalue.v + ", " + 
+                            toStr( MAX_STR - 1 ) + " );\n" +
+                "  " + lvalue.v + "[" + toStr( MAX_STR - 1 ) + "] = 0;\n";
+      }
+      else
+        SS->c = lvalue.c + rvalue.c + 
+                "  " + lvalue.v + " = " + rvalue.v + ";\n"; 
+    }
+    else
+      erro( "Expressao " + rvalue.t.nome + 
+            " nao pode ser atribuida a variavel " +
+            lvalue.t.nome );
+    } 
+    else
+      erro( "Variavel nao declarada: " + lvalue.v );
+}      
+       
 void geraCodigoIfComElse( Atributo* SS, const Atributo& expr, 
                                         const Atributo& cmdsThen,
                                         const Atributo& cmdsElse ) {
