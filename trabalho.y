@@ -5,6 +5,17 @@
 #include <iostream>
 #include <map>
 
+/*
+ * Programa exemplo deum compilador para o curso de Compiladores-2014-2 - Zimbrão
+ * TODO:
+ * - variavel do tipo boolean
+ * - Funções e parametros
+ * - Variaveis locais
+ * - Array
+ * - pipes
+ *
+ */
+
 using namespace std;
 
 struct Tipo {
