@@ -130,14 +130,20 @@ CMD_IF : _IF E _THEN CMDS _END _IF
          { geraCodigoIfComElse( &$$, $2, $4, $6 ); }
        ;
   
-CMD_OUT : _COUT _SHIFTL E 
-          { if( $3.t.nome == "int" )
-              $$.c = $3.c + 
-                     "  printf( \"%d\" , " + $3.v + " );\n";
-            else if( $3.t.nome == "string" )
-              $$.c = $3.c + 
-                     "  printf( \"%s\" , " + $3.v + " );\n";}
+CMD_OUT : _COUT COUT_EXPR
+          { $$ = $2; }
         ;
+        
+COUT_EXPR : COUT_EXPR _SHIFTL E 
+            { if( $3.t.nome == "int" )
+                $$.c = $1.c + $3.c + 
+                       "  printf( \"%d\" , " + $3.v + " );\n";
+              else if( $3.t.nome == "string" )
+                $$.c = $1.c + $3.c + 
+                       "  printf( \"%s\" , " + $3.v + " );\n";}
+          | { $$ = Atributo(); }
+          ;
+                     
 
 DECLVAR : DECLVAR ',' _ID
           { insereVariavelTS( ts, $3.v, $1.t ); 
