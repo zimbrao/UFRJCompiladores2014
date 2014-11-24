@@ -22,11 +22,15 @@ COMMENT "//".*
 "string"	{  yylval = Atributo( "", yytext ); return _STRING; }
 
 "<<" 		{  yylval = Atributo( yytext ); return _SHIFTL; }
-"cout"		{  yylval = Atributo( yytext ); return _COUT; }
+"=>"		{  yylval = Atributo( yytext ); return _PIPE; }
+".."		{  yylval = Atributo( yytext ); return _2PTS; }
+"=="		{  yylval = Atributo( yytext ); return _IG; }
 
 {INT}      	{ yylval = Atributo( yytext ); return _CTE_INT; }
 {DOUBLE}   	{ yylval = Atributo( yytext ); return _CTE_DOUBLE; }
 {STRING}   	{ yylval = Atributo( yytext ); return _CTE_STRING; }
+
+"COUT"		{  yylval = Atributo( yytext ); return _COUT; }
 "PROGRAM"	{ yylval = Atributo( yytext ); return _PROGRAM; }
 "VAR"		{ yylval = Atributo( yytext ); return _VAR; }
 "BEGIN"		{ yylval = Atributo( yytext ); return _BEGIN; }
@@ -35,6 +39,9 @@ COMMENT "//".*
 "IF"		{ yylval = Atributo( yytext ); return _IF; }
 "THEN"		{ yylval = Atributo( yytext ); return _THEN; }
 "ELSE"		{ yylval = Atributo( yytext ); return _ELSE; }
+"INTERVALO"	{ yylval = Atributo( yytext ); return _INTERVALO; }
+"FILTER"	{ yylval = Atributo( yytext ); return _FILTER; }
+"FOREACH"	{ yylval = Atributo( yytext ); return _FOREACH; }
 
 
 {ID}       { yylval = Atributo( yytext ); return _ID; }

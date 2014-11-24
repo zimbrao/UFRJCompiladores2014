@@ -79,10 +79,11 @@ void yyerror(const char *);
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
 %token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING  _COUT _SHIFTL
 %token _PROGRAM _VAR _BEGIN _END _FUNCTION _IF _THEN _ELSE
+%token _PIPE _INTERVALO _FILTER _FOREACH _2PTS
 
-%nonassoc '<' '>'
-%left '+' '-'
-%left '*' '/'
+%nonassoc '<' '>' _IG
+%left '+' '-' 
+%left '*' '/' '%'
 
 %%
 
@@ -114,15 +115,31 @@ MAIN : _BEGIN CMDS _END
        { geraCodigoFuncaoPrincipal( &$$, $2 ); }
      ; 
 
-CMDS : ATR ';' CMDS 
-       { $$.c = $1.c + $3.c; }
-     | CMD_OUT ';' CMDS  
-       { $$.c = $1.c + $3.c; }
-     | CMD_IF ';' CMDS  
-       { $$.c = $1.c + $3.c; }
-     |
-       { $$ = Atributo(); }
+CMD : CMD_ATR   
+    | CMD_OUT  
+    | CMD_IF    
+    ;
+
+CMDS : CMD ';' CMDS  		{ $$.c = $1.c + $3.c; }
+     | CMD_PIPE ';' CMDS  	{ $$.c = $1.c + $3.c; }
+     | { $$ = Atributo(); }
      ;
+     
+CMD_PIPE : PRODUZ PROCS CONSOME 
+	   { $$.c = $1.c + $2.c +$3.c; }
+         ;
+         
+PRODUZ : _INTERVALO '[' E _2PTS E ']' 
+       ;
+
+PROCS : PROCS PROC _PIPE 
+      | _PIPE
+      ;
+      
+PROC : _FILTER '[' E ']'
+     ;
+      
+CONSOME : _FOREACH '[' CMD ']';
   
 CMD_IF : _IF E _THEN CMDS _END _IF
          { geraCodigoIfSemElse( &$$, $2, $4 ); }
@@ -161,9 +178,9 @@ TIPO : _INT
      | _STRING
      ;
   
-ATR : _ID '=' E 
-      { geraCodigoAtribuicao( &$$, $1, $3 ); }
-    ;
+CMD_ATR : _ID '=' E 
+          { geraCodigoAtribuicao( &$$, $1, $3 ); }
+        ;
 
 E : E '+' E   
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
@@ -171,9 +188,13 @@ E : E '+' E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '*' E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
+  | E '%' E
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '/' E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '<' E
+    { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
+  | E _IG E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | E '>' E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
@@ -297,6 +318,7 @@ void geraCodigoOperadorBinario( Atributo* SS, const Atributo& S1, const Atributo
   SS->v = geraTemp( SS->t );
 
   if( SS->t.nome == "string" ) {
+    // Falta o operador de comparação para string
     SS->c = S1.c + S3.c + 
             "\n  strncpy( " + SS->v + ", " + S1.v + ", " + 
                         toStr( MAX_STR - 1 ) + " );\n" +
@@ -314,6 +336,8 @@ void inicializaResultadoOperador() {
   resultadoOperador["int+int"] = Tipo( "int" );
   resultadoOperador["int-int"] = Tipo( "int" );
   resultadoOperador["int*int"] = Tipo( "int" );
+  resultadoOperador["int==int"] = Tipo( "bool" );
+  resultadoOperador["int%int"] = Tipo( "int" );
   resultadoOperador["int/int"] = Tipo( "int" );
   resultadoOperador["int<int"] = Tipo( "bool" );
   resultadoOperador["int>int"] = Tipo( "bool" );

@@ -1,5 +1,6 @@
-PROGRAM Principal;
+ PROGRAM Principal;
 
 BEGIN
-  cout << 1+2 << 3+4 << "\n";
+  INTERVALO[ 0..10 ]=>FILTER[ 1 % 2 == 0 ]=>FOREACH[ COUT << 1 << "\n" ]; 
 END.
+
