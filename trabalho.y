@@ -45,15 +45,17 @@ struct Atributo {
 typedef map< string, Tipo > TS;
 TS ts; // Tabela de simbolos
 
+string pipeAtivo; // Tipo do pipe ativo
+
 Tipo tipoResultado( Tipo a, string operador, Tipo b );
 string geraTemp( Tipo tipo );
 string geraDeclaracaoTemporarias();
+string geraDeclaracaoVarPipe();
 
 void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
 bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
 string toStr( int n );
-
 
 void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue, const Atributo& rvalue );
 void geraCodigoOperadorBinario( Atributo* SS, const Atributo& S1, const Atributo& S2, const Atributo& S3 );
@@ -79,7 +81,7 @@ void yyerror(const char *);
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
 %token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING  _COUT _SHIFTL
 %token _PROGRAM _VAR _BEGIN _END _FUNCTION _IF _THEN _ELSE
-%token _PIPE _INTERVALO _FILTER _FOREACH _2PTS
+%token _PIPE _INTERVALO _FILTER _FOREACH _2PTS _X
 
 %nonassoc '<' '>' _IG
 %left '+' '-' 
@@ -129,7 +131,8 @@ CMD_PIPE : PRODUZ PROCS CONSOME
 	   { $$.c = $1.c + $2.c +$3.c; }
          ;
          
-PRODUZ : _INTERVALO '[' E _2PTS E ']' 
+PRODUZ : _INTERVALO '[' E _2PTS E ']'
+         { pipeAtivo =  $3.t.nome; }
        ;
 
 PROCS : PROCS PROC _PIPE 
@@ -137,9 +140,13 @@ PROCS : PROCS PROC _PIPE
       ;
       
 PROC : _FILTER '[' E ']'
+       { $$.c = $3.c; }
      ;
       
-CONSOME : _FOREACH '[' CMD ']';
+CONSOME : _FOREACH '[' CMD ']'
+          { pipeAtivo = ""; 
+            $$.c = $3.c; }
+        ;
   
 CMD_IF : _IF E _THEN CMDS _END _IF
          { geraCodigoIfSemElse( &$$, $2, $4 ); }
@@ -217,6 +224,12 @@ F : _ID
     {  $$.v = $1.v; 
        $$.t = Tipo( "string" ); }
   | '(' E ')'  { $$ = $2; }
+  | _X
+    { if( pipeAtivo != "" )
+        $$ = Atributo( "x_" + pipeAtivo, pipeAtivo ); 
+      else
+        erro( "Variavel 'x' so pode ser usada dentro de pipe" );
+    }
   ;
 
 %%
@@ -282,6 +295,8 @@ void geraDeclaracaoVariavel( Atributo* SS, const Atributo& tipo,
 void geraCodigoFuncaoPrincipal( Atributo* SS, const Atributo& cmds ) {
   *SS = Atributo();
   SS->c = "\nint main() {\n" +
+           geraDeclaracaoVarPipe() + 
+           "\n" + 
            geraDeclaracaoTemporarias() + 
            "\n" +
            cmds.c + 
@@ -367,6 +382,12 @@ void yyerror( const char* st )
 void erro( string msg ) {
   yyerror( msg.c_str() );
   exit(0);
+}
+
+string geraDeclaracaoVarPipe() {
+  return "  int x_int;\n"
+         "  double x_double;\n"
+         "  float x_float;\n";
 }
 
 string geraTemp( Tipo tipo ) {

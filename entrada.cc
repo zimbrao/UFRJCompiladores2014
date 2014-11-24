@@ -1,6 +1,8 @@
  PROGRAM Principal;
-
+ 
 BEGIN
-  INTERVALO[ 0..10 ]=>FILTER[ 1 % 2 == 0 ]=>FOREACH[ COUT << 1 << "\n" ]; 
+  INTERVALO[ 1.0 .. 20.0 ]
+    //=>FILTER[ x % 2 == 0 ]
+    =>FOREACH[ COUT << x << "\n" ]; 
 END.
 

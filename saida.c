@@ -4,9 +4,12 @@
 
 
 int main() {
-  int temp_bool_1;
-  int temp_int_1;
+  int x_int;
+  double x_double;
+  float x_float;
 
+
+  printf( "%s" , "\n" );
   return 0;
 }
 

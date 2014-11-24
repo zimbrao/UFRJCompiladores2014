@@ -42,7 +42,7 @@ COMMENT "//".*
 "INTERVALO"	{ yylval = Atributo( yytext ); return _INTERVALO; }
 "FILTER"	{ yylval = Atributo( yytext ); return _FILTER; }
 "FOREACH"	{ yylval = Atributo( yytext ); return _FOREACH; }
-
+"x"		{ yylval = Atributo( yytext ); return _X; }
 
 {ID}       { yylval = Atributo( yytext ); return _ID; }
 .          { yylval = Atributo( yytext ); return *yytext; }
