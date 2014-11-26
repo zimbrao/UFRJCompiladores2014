@@ -46,9 +46,11 @@ typedef map< string, Tipo > TS;
 TS ts; // Tabela de simbolos
 
 string pipeAtivo; // Tipo do pipe ativo
+string passoPipeAtivo; // Label 'fim' do pipe ativo
 
 Tipo tipoResultado( Tipo a, string operador, Tipo b );
 string geraTemp( Tipo tipo );
+string geraLabel( string cmd );
 string geraDeclaracaoTemporarias();
 string geraDeclaracaoVarPipe();
 
@@ -65,6 +67,11 @@ void geraCodigoIfComElse( Atributo* SS, const Atributo& expr,
                                         const Atributo& cmdsElse );
 void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr, 
                                         const Atributo& cmdsThen );
+void geraCodigoFor( Atributo* SS, const Atributo& inicial, 
+                                  const Atributo& condicao, 
+                                  const Atributo& passo, 
+                                  const Atributo& cmds );
+void geraCodigoFilter( Atributo* SS, const Atributo& condicao );
 
 void geraDeclaracaoVariavel( Atributo* SS, const Atributo& tipo,
                                            const Atributo& id );
@@ -127,25 +134,43 @@ CMDS : CMD ';' CMDS  		{ $$.c = $1.c + $3.c; }
      | { $$ = Atributo(); }
      ;
      
-CMD_PIPE : PRODUZ PROCS CONSOME 
-	   { $$.c = $1.c + $2.c +$3.c; }
-         ;
-         
-PRODUZ : _INTERVALO '[' E _2PTS E ']'
-         { pipeAtivo =  $3.t.nome; }
-       ;
+CMD_PIPE : _INTERVALO '[' E _2PTS INI_PIPE ']' PROCS CONSOME 
+          { 
+            Atributo inicio, condicao, passo, cmd;
+            
+            inicio.c = $3.c + $5.c +
+                       "  x_" + pipeAtivo + " = " + $3.v + ";\n";
+            condicao.t.nome = "bool";
+            condicao.v = geraTemp( Tipo( "bool" ) ); 
+            condicao.c = "  " + condicao.v + " = " + "x_" + pipeAtivo + 
+                         " <= " + $5.v + ";\n";
+            passo.c = passoPipeAtivo + ":\n" + 
+                      "  x_" + pipeAtivo + " = x_" + pipeAtivo + " + 1;\n";
+            cmd.c = $7.c + $8.c;
+            
+            geraCodigoFor( &$$, inicio, condicao, passo, cmd );
+            
+            pipeAtivo = ""; }
+        ;
 
-PROCS : PROCS PROC _PIPE 
+INI_PIPE : E
+           { $$ = $1;
+             pipeAtivo =  $1.t.nome;
+	     passoPipeAtivo = geraLabel( "passo_pipe" ); }
+	 ;    
+        
+PROCS : _PIPE PROC PROCS 
+        { $$.c = $2.c + $3.c; }
       | _PIPE
+        { $$ = Atributo(); }
       ;
       
 PROC : _FILTER '[' E ']'
-       { $$.c = $3.c; }
+       { geraCodigoFilter( &$$, $3 ); }
      ;
       
 CONSOME : _FOREACH '[' CMD ']'
-          { pipeAtivo = ""; 
-            $$.c = $3.c; }
+          { $$.c = $3.c; }
         ;
   
 CMD_IF : _IF E _THEN CMDS _END _IF
@@ -236,6 +261,42 @@ F : _ID
 int nlinha = 1;
 map<string,int> n_var_temp;
 map<string,Tipo> resultadoOperador;
+map<string,int> label;
+
+string geraLabel( string cmd ) {
+  return "L_" + cmd +"_" + toStr( ++label[cmd] );
+}
+
+void geraCodigoFor( Atributo* SS, const Atributo& inicial, 
+                                  const Atributo& condicao, 
+                                  const Atributo& passo, 
+                                  const Atributo& cmds ) {
+  string forCond = geraLabel( "for_cond" ),
+         forFim = geraLabel( "for_fim" );
+  string valorNotCond = geraTemp( Tipo( "bool" ) );
+         
+  *SS = Atributo();
+  if( condicao.t.nome != "bool" )
+    erro( "A expressão de teste deve ser booleana: " + condicao.t.nome ); 
+  
+  // Funciona apenas para filtro, sem pipe que precisa de buffer 
+  // (sort, por exemplo, não funciona)
+  SS->c = inicial.c + forCond + ":\n" + condicao.c +
+          "  " + valorNotCond + " = !" + condicao.v + ";\n" +
+          "  if( " + valorNotCond + " ) goto " + forFim + ";\n" +
+          cmds.c +
+          passo.c +
+          "  goto " + forCond + ";\n" + 
+          forFim + ":\n";
+}
+
+void geraCodigoFilter( Atributo* SS, const Atributo& condicao ) {
+  *SS = Atributo();
+  SS->v = geraTemp( Tipo( "bool" ) );
+  SS->c = condicao.c + 
+          "  " + SS->v + " = !" + condicao.v + ";\n" +
+          "  if( " + SS->v + " ) goto " + passoPipeAtivo + ";\n";
+}
 
 void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue, 
                                          const Atributo& rvalue ) {
@@ -263,14 +324,18 @@ void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue,
 void geraCodigoIfComElse( Atributo* SS, const Atributo& expr, 
                                         const Atributo& cmdsThen,
                                         const Atributo& cmdsElse ) {
+  string ifTrue = geraLabel( "if_true" ),
+         ifFalse = geraLabel( "if_false" ),
+         ifFim = geraLabel( "if_fim" );
+      
   *SS = Atributo();
   SS->c = expr.c + 
-          "  if( " + expr.v + " ) goto if_true;\n" +
-          "  goto if_false;\n" +
-          "  if_true:\n" + cmdsThen.c +
-          "  goto if_fim;\n" +
-          "  if_false:\n" + cmdsElse.c +
-          "  if_fim:\n";
+          "  if( " + expr.v + " ) goto " + ifTrue + ";\n" +
+          "  goto " + ifFalse + ";\n" +
+          "  " + ifTrue + ":\n" + cmdsThen.c +
+          "  goto " + ifFim + ";\n" +
+          "  " + ifFalse + ":\n" + cmdsElse.c +
+          "  " + ifFim + ":\n";
 }
 
 void geraCodigoIfSemElse( Atributo* SS, const Atributo& expr, 
