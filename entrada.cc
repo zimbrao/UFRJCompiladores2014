@@ -1,8 +1,10 @@
- PROGRAM Principal;
- 
+PROGRAM Principal;
+
+VAR int a;
+
 BEGIN
-  INTERVALO[ 0 .. 20 ]
-    =>FILTER[ (x*x) % 3 == 0 ] =>FILTER[ x % 2 == 0 ]
-    =>FOREACH[ COUT << x << "\n" ]; 
+  SWITCH ( a * a ) {
+    CASE 1 : COUT << a;
+  }
 END.
 

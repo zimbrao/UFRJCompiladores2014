@@ -88,7 +88,8 @@ void yyerror(const char *);
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
 %token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING  _COUT _SHIFTL
 %token _PROGRAM _VAR _BEGIN _END _FUNCTION _IF _THEN _ELSE
-%token _PIPE _INTERVALO _FILTER _FOREACH _2PTS _X
+%token _PIPE _INTERVALO _FILTER _FOREACH _2PTS _X _SWITCH _BREAK _CASE
+
 
 %nonassoc '<' '>' _IG
 %left '+' '-' 
@@ -122,17 +123,25 @@ FUNC : _FUNCTION
 
 MAIN : _BEGIN CMDS _END
        { geraCodigoFuncaoPrincipal( &$$, $2 ); }
-     ; 
-
-CMD : CMD_ATR   
-    | CMD_OUT  
-    | CMD_IF    
-    ;
-
-CMDS : CMD ';' CMDS  		{ $$.c = $1.c + $3.c; }
+     ;
+     
+CMDS : CMD CMDS  		{ $$.c = $1.c + $2.c; }
      | CMD_PIPE ';' CMDS  	{ $$.c = $1.c + $3.c; }
      | { $$ = Atributo(); }
      ;
+     
+CMD : CMD_ATR ';'  
+    | CMD_OUT ';' 
+    | CMD_IF  
+    | CMD_SW 
+    ;
+    
+CMD_SW : _SWITCH SW '}'
+       ;
+       
+SW : '(' E ')' '{' _CASE E ':' CMDS
+   | SW _CASE ':' CMDS
+   ;
      
 CMD_PIPE : _INTERVALO '[' E _2PTS INI_PIPE ']' PROCS CONSOME 
           { 
