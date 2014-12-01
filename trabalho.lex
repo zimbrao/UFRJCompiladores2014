@@ -45,6 +45,9 @@ COMMENT "//".*
 "SWITCH"	{ yylval = Atributo( yytext ); return _SWITCH; }
 "CASE"		{ yylval = Atributo( yytext ); return _CASE; }
 "BREAK"		{ yylval = Atributo( yytext ); return _BREAK; }
+"RETURN"	{ yylval = Atributo( yytext ); return _RETURN; }
+"PROCEDURE"	{ yylval = Atributo( yytext ); return _PROCEDURE; }
+"FORWARD"	{ yylval = Atributo( yytext ); return _FORWARD; }
 
 "x"		{ yylval = Atributo( yytext ); return _X; }
 

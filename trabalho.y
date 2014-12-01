@@ -87,8 +87,9 @@ void yyerror(const char *);
 
 %token _CTE_INT _CTE_CHAR _CTE_DOUBLE _CTE_STRING _ID 
 %token _INT _CHAR _BOOL _DOUBLE _FLOAT _STRING  _COUT _SHIFTL
-%token _PROGRAM _VAR _BEGIN _END _FUNCTION _IF _THEN _ELSE
+%token _PROGRAM _VAR _BEGIN _END _FUNCTION _IF _THEN _ELSE _PROCEDURE
 %token _PIPE _INTERVALO _FILTER _FOREACH _2PTS _X _SWITCH _BREAK _CASE
+%token _FORWARD _RETURN
 
 
 %nonassoc '<' '>' _IG
@@ -118,12 +119,29 @@ VARGLOBAL : _VAR DECLVAR ';'
             { $$ = $2; }
           ;
 
-FUNC : _FUNCTION
+FUNC : CABECALHO ';' CORPO
+     | CABECALHO ';' _FORWARD ';'
      ; 
+     
+CABECALHO : _FUNCTION _ID '(' PARAMS ')' ':' TIPO
+          | _FUNCTION _ID ':' TIPO
+          | _PROCEDURE _ID '(' PARAMS ')'
+          | _PROCEDURE _ID
+          ;
+          
+CORPO : VARLOCAL _BEGIN CMDS _END ';'
+      ;  
+
+VARLOCAL : _VAR DECLVAR ';'
+         ;
 
 MAIN : _BEGIN CMDS _END
        { geraCodigoFuncaoPrincipal( &$$, $2 ); }
      ;
+     
+PARAMS : PARAMS ',' TIPO _ID
+       | TIPO _ID
+       ;
      
 BLOCO : '{' CMDS '}' 
         { $$ = $2; }
@@ -132,6 +150,7 @@ BLOCO : '{' CMDS '}'
 CMDS : CMD CMDS  		{ $$.c = $1.c + $2.c; }
      | CMD_PIPE ';' CMDS  	{ $$.c = $1.c + $3.c; }
      | { $$ = Atributo(); }
+     | BLOCO
      ;
      
 CMD : CMD_ATR ';'  

@@ -1,10 +1,15 @@
 PROGRAM Principal;
+FUNCTION g( int a, double b ) : int; FORWARD;
 
-VAR int a;
+VAR int a, h;
+
+FUNCTION f( int b, double c ) : int;
+  VAR int a;
+BEGIN
+   RETURN 0;
+END;
 
 BEGIN
-  SWITCH ( a * a ) {
-    CASE 1 : COUT << a;
-  }
+  a = 3*f( 1+h, 2 );
 END.
 
