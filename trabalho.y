@@ -125,6 +125,10 @@ MAIN : _BEGIN CMDS _END
        { geraCodigoFuncaoPrincipal( &$$, $2 ); }
      ;
      
+BLOCO : '{' CMDS '}' 
+        { $$ = $2; }
+      ;
+     
 CMDS : CMD CMDS  		{ $$.c = $1.c + $2.c; }
      | CMD_PIPE ';' CMDS  	{ $$.c = $1.c + $3.c; }
      | { $$ = Atributo(); }
