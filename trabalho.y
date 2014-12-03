@@ -129,7 +129,7 @@ DECLS : VARGLOBAL DECLS
       ;
       
 VARGLOBAL : _VAR { ts = &ts_global; } DECLVAR ';'
-            { $$ = $2; }
+            { $$ = $3; }
           ;
 
 FUNC : CABECALHO PREPARA_FUNCAO ';' CORPO
@@ -385,11 +385,16 @@ void geraCodigoFilter( Atributo* SS, const Atributo& condicao ) {
           "  if( " + SS->v + " ) goto " + passoPipeAtivo + ";\n";
 }
 
-void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue, 
+void geraCodigoAtribuicaoSemIndice( Atributo* SS, Atributo& lvalue, 
                                          const Atributo& rvalue ) {
-  if( buscaVariavelTS( *ts, lvalue.v, &lvalue.t ) ) {
-    if( lvalue.t.nome == rvalue.t.nome ) {
-      if( lvalue.t.nome == "string" ) {
+  if( !buscaVariavelTS( *ts, lvalue.v, &lvalue.t ) ) 
+    erro( "Variavel nao declarada: " + lvalue.v );
+  else if( lvalue.t.nome != rvalue.t.nome )
+    erro( "Expressao " + rvalue.t.nome + 
+            " nao pode ser atribuida a variavel " + lvalue.t.nome );
+  else if( lvalue.t.nDim != 0 || rvalue.t.nDim != 0 )
+    erro( "Atribuicao de array nao e permitida: " + lvalue.v + " = " + rvalue.v );
+  else if( lvalue.t.nome == "string" ) {
         SS->c = lvalue.c + rvalue.c + 
                 "  strncpy( " + lvalue.v + ", " + rvalue.v + ", " + 
                             toStr( MAX_STR - 1 ) + " );\n" +
@@ -398,15 +403,26 @@ void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue,
       else
         SS->c = lvalue.c + rvalue.c + 
                 "  " + lvalue.v + " = " + rvalue.v + ";\n"; 
-    }
-    else
-      erro( "Expressao " + rvalue.t.nome + 
-            " nao pode ser atribuida a variavel " +
-            lvalue.t.nome );
-    } 
-    else
-      erro( "Variavel nao declarada: " + lvalue.v );
 }      
+       
+void geraCodigoAtribuicao1Indice( Atributo* SS, Atributo& lvalue, 
+                                                Atributo& indice1, 
+                                                const Atributo& rvalue ) {
+  SS->c = indice1.c + rvalue.c +
+          "  " + lvalue.v + "[" + indice1.v + "] = " + rvalue.v + ";\n";
+}
+void geraCodigoAtribuicao2Indices( Atributo* SS, Atributo& lvalue, 
+                                                 Atributo& indice1, 
+                                                 Atributo& indice2, 
+                                                 const Atributo& rvalue ){
+}
+void geraCodigoAtribuicao3Indices( Atributo* SS, Atributo& lvalue, 
+                                                 Atributo& indice1, 
+                                                 Atributo& indice2, 
+                                                 Atributo& indice3, 
+                                                 const Atributo& rvalue ){
+}
+       
        
 void geraCodigoIfComElse( Atributo* SS, const Atributo& expr, 
                                         const Atributo& cmdsThen,
@@ -438,9 +454,14 @@ void geraDeclaracaoVariavel( Atributo* SS, const Atributo& tipo,
     SS->c = tipo.c + 
            "char " + id.v + "["+ toStr( MAX_STR ) +"];\n";   
   }
-  else {
-    SS->c = tipo.c + 
-            tipo.t.nome + " " + id.v + ";\n";
+  switch( tipo.t.nDim ) {
+    case 0: 
+      SS->c = tipo.c + tipo.t.nome + " " + id.v + ";\n"; 
+      break;
+      
+   case 1:
+     SS->c = tipo.c + tipo.t.nome + " " + id.v + "[" + toStr( tipo.t.d1 ) + "];\n";
+    
   }
 }
 
