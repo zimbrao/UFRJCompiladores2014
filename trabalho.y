@@ -2,8 +2,8 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
-#include <iostream>
-#include <map>
+#include <iostream> 
+#include  <map>
 
 /*
  * Programa exemplo de um compilador para o curso de Compiladores-2014-2 - Zimbrão
@@ -22,10 +22,16 @@ const int MAX_STR = 256;
 
 struct Tipo {
   string nome;
+  int nDim;
+  int d1;
+  int d2;
   
-  Tipo() {}
+  Tipo() { nome = ""; nDim = 0; d1 = 0; d2 = 0; }
   Tipo( string nome ) {
     this->nome = nome;
+    nDim = 0; 
+    d1 = 0; 
+    d2 = 0;
   }
 };
 
@@ -43,7 +49,9 @@ struct Atributo {
 };
 
 typedef map< string, Tipo > TS;
-TS ts; // Tabela de simbolos
+
+TS ts_local, ts_global;
+TS* ts = &ts_global; // Tabela de simbolos da vez
 
 string pipeAtivo; // Tipo do pipe ativo
 string passoPipeAtivo; // Label 'fim' do pipe ativo
@@ -58,8 +66,13 @@ void insereVariavelTS( TS&, string nomeVar, Tipo tipo );
 bool buscaVariavelTS( TS&, string nomeVar, Tipo* tipo );
 void erro( string msg );
 string toStr( int n );
+int toInt( string n );
 
-void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue, const Atributo& rvalue );
+void geraCodigoAtribuicaoSemIndice( Atributo* SS, Atributo& lvalue, const Atributo& rvalue );
+void geraCodigoAtribuicao1Indice( Atributo* SS, Atributo& lvalue, Atributo& indice1, const Atributo& rvalue );
+void geraCodigoAtribuicao2Indices( Atributo* SS, Atributo& lvalue, Atributo& indice1, Atributo& indice2, const Atributo& rvalue );
+void geraCodigoAtribuicao3Indices( Atributo* SS, Atributo& lvalue, Atributo& indice1, Atributo& indice2, Atributo& indice3, const Atributo& rvalue );
+
 void geraCodigoOperadorBinario( Atributo* SS, const Atributo& S1, const Atributo& S2, const Atributo& S3 );
 void geraCodigoFuncaoPrincipal( Atributo* SS, const Atributo& cmds );
 void geraCodigoIfComElse( Atributo* SS, const Atributo& expr, 
@@ -115,13 +128,16 @@ DECLS : VARGLOBAL DECLS
         { $$ = Atributo(); }
       ;
       
-VARGLOBAL : _VAR DECLVAR ';'
+VARGLOBAL : _VAR { ts = &ts_global; } DECLVAR ';'
             { $$ = $2; }
           ;
 
-FUNC : CABECALHO ';' CORPO
-     | CABECALHO ';' _FORWARD ';'
+FUNC : CABECALHO PREPARA_FUNCAO ';' CORPO
+     | CABECALHO PREPARA_FUNCAO ';' _FORWARD ';'
      ; 
+     
+PREPARA_FUNCAO : { ts = &ts_local; } // Passa a usar a tabela de var local.
+               ;
      
 CABECALHO : _FUNCTION _ID '(' PARAMS ')' ':' TIPO
           | _FUNCTION _ID ':' TIPO
@@ -157,7 +173,12 @@ CMD : CMD_ATR ';'
     | CMD_OUT ';' 
     | CMD_IF  
     | CMD_SW 
+    | CMD_RETURN ';'
     ;
+    
+CMD_RETURN : _RETURN E
+           | _RETURN
+           ;
     
 CMD_SW : _SWITCH SW '}'
        ;
@@ -227,24 +248,42 @@ COUT_EXPR : COUT_EXPR _SHIFTL E
                      
 
 DECLVAR : DECLVAR ',' _ID
-          { insereVariavelTS( ts, $3.v, $1.t ); 
+          { insereVariavelTS( *ts, $3.v, $1.t ); 
             geraDeclaracaoVariavel( &$$, $1, $3 ); }
         | TIPO _ID
-          { insereVariavelTS( ts, $2.v, $1.t ); 
+          { insereVariavelTS( *ts, $2.v, $1.t ); 
             geraDeclaracaoVariavel( &$$, $1, $2 ); }
         ;
     
-TIPO : _INT
-     | _CHAR
-     | _BOOL
-     | _DOUBLE
-     | _FLOAT
-     | _STRING
+TIPO : TIPOSIMPLES 
+     | TIPOSIMPLES '[' _CTE_INT ']'
+       { $$ = $1;
+         $$.t.nDim = 1;
+         $$.t.d1 = toInt( $3.v ); }
+     | TIPOSIMPLES '[' _CTE_INT _X _CTE_INT ']'
+       { $$ = $1;
+         $$.t.nDim = 2;
+         $$.t.d1 = toInt( $3.v ); 
+         $$.t.d2 = toInt( $5.v ); }
      ;
+    
+TIPOSIMPLES : _INT
+            | _CHAR
+            | _BOOL
+            | _DOUBLE
+            | _FLOAT
+            | _STRING
+            ;
   
 CMD_ATR : _ID '=' E 
-          { geraCodigoAtribuicao( &$$, $1, $3 ); }
-        ;
+          { geraCodigoAtribuicaoSemIndice( &$$, $1, $3 ); }
+        | _ID '[' E ']' '=' E 
+          { geraCodigoAtribuicao1Indice( &$$, $1, $3, $6 ); }
+        | _ID '[' E ',' E ']'  '=' E 
+          { geraCodigoAtribuicao2Indices( &$$, $1, $3, $5, $8 ); }
+        | _ID '[' E ',' E ',' E ']'  '=' E 
+          { geraCodigoAtribuicao3Indices( &$$, $1, $3, $5, $7, $10 ); }
+       ;
 
 E : E '+' E   
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
@@ -264,13 +303,26 @@ E : E '+' E
     { geraCodigoOperadorBinario( &$$, $1, $2, $3 ); }
   | F
   ;
+  
+ARGS : ARGS ',' E
+       { $$.c = $1.c + $3.c;
+         $$.v = $1.v + ", " + $3.v; }
+     | E
+     ;
 
 F : _ID		
-  { if( buscaVariavelTS( ts, $1.v, &$$.t ) ) 
+  { if( buscaVariavelTS( *ts, $1.v, &$$.t ) ) 
       $$.v = $1.v; 
     else
       erro( "Variavel nao declarada: " + $1.v );
   }	
+  | _ID '(' ARGS ')'
+    { // $$.t BUSCAR ID na tabela de funções
+      $$.t = Tipo("int");
+      $$.v = geraTemp( $$.t );
+      $$.c = $3.c +
+             $$.v + " = " + $1.v + "( " + $3.v + ");\n"; 
+    }
   | _CTE_INT 
     {  $$.v = $1.v; 
        $$.t = Tipo( "int" ); }
@@ -287,6 +339,9 @@ F : _ID
       else
         erro( "Variavel 'x' so pode ser usada dentro de pipe" );
     }
+  | _ID '[' E ']'
+  | _ID '[' E ']' '[' E ']'
+  | _ID '[' E ']' '[' E ']' '[' E ']' // Esse caso só ocorre em Matriz de string
   ;
 
 %%
@@ -332,7 +387,7 @@ void geraCodigoFilter( Atributo* SS, const Atributo& condicao ) {
 
 void geraCodigoAtribuicao( Atributo* SS, Atributo& lvalue, 
                                          const Atributo& rvalue ) {
-  if( buscaVariavelTS( ts, lvalue.v, &lvalue.t ) ) {
+  if( buscaVariavelTS( *ts, lvalue.v, &lvalue.t ) ) {
     if( lvalue.t.nome == rvalue.t.nome ) {
       if( lvalue.t.nome == "string" ) {
         SS->c = lvalue.c + rvalue.c + 
@@ -462,8 +517,14 @@ void inicializaResultadoOperador() {
 
 int yyparse();
 
-string toStr( int n ) {
-  char buf[1024] = "";
+int toInt( string n ) {
+  int aux = 0;
+  sscanf( n.c_str(), "%d", &aux );
+  
+  return aux;
+}
+
+string toStr( int n ) {  char buf[1024] = "";
   
   sprintf( buf, "%d", n );
   
@@ -478,7 +539,7 @@ void yyerror( const char* st )
 
 void erro( string msg ) {
   yyerror( msg.c_str() );
-  exit(0);
+  exit(1);
 }
 
 string geraDeclaracaoVarPipe() {

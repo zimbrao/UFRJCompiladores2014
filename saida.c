@@ -1,3 +1,3 @@
-Variavel já definida: a
-Linha: 7
-Perto de: 'a'
+Expressao  nao pode ser atribuida a variavel int
+Linha: 9
+Perto de: ';'
